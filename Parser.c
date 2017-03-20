@@ -85,6 +85,7 @@ void Factor(node *currentNode);
 void getNextToken(node *currentNode);
 void error(int error);
 void emit(int op, int r, int l, int m);
+void textForVM()
 
 node *createNode(int data);
 node *insertNode(node *head, node *tail, int token);
@@ -108,6 +109,8 @@ int main(int argc, char **argv){
     tokenSize = getTokenList(tokens);
     // Stuff from Compiler Driver goes here
     Program(currentNode);
+    
+    textForVM();
 }
 
 void Program(node *currentNode){
@@ -530,6 +533,7 @@ void Factor(node *currentNode){
 }
 
 void emit(int op, int r, int l, int m){
+    
     if(codeIndex > MAX_CODE_LENGTH)
         error(25);
 
@@ -540,7 +544,6 @@ void emit(int op, int r, int l, int m){
         code[codeIndex].m = m;
         codeIndex++;
     }
-
 }
 
 void error(int error){
@@ -751,4 +754,16 @@ int findToken(int token){
             return location;
 
     return location;
+}
+
+void textForVM(){
+    int i = 0;
+    FILE *fp;
+    
+    fp = fopen("codeToVM.txt", "w");
+    
+    for(i = 0; i < codeIndex; i++)
+        fprintf(fp, "%d %d %d %d\n", code[i].op, code[i].r, code[i].l, code[i].m);
+    
+    fclose(fp);
 }
