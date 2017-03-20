@@ -49,55 +49,43 @@ int main(int argc, char * argv[]){
 
 	FILE *pl0Code;
 
-    if(argc == 2){
-        pl0Code = fopen(argv[1], "r");
+    pl0Code = fopen("CodeGenOutput.txt", "r");
 
-        if(pl0Code!=NULL){
-            // scanning in data
-            while(!feof(pl0Code) && totalSize<MAX_CODE_LENGTH){
-                fscanf(pl0Code, "%d %d %d %d", &code[totalSize].op, &code[totalSize].r, &code[totalSize].l, &code[totalSize].m);
-                totalSize++;
-            }
-            totalSize--;
+    if(pl0Code!=NULL){
+        // scanning in data
+        while(!feof(pl0Code) && totalSize<MAX_CODE_LENGTH){
+            fscanf(pl0Code, "%d %d %d %d", &code[totalSize].op, &code[totalSize].r, &code[totalSize].l, &code[totalSize].m);
+            totalSize++;
+        }
+        totalSize--;
 
-            fclose(pl0Code);
+        fclose(pl0Code);
 
-            FILE *output;
-            output = fopen("output.txt", "w");
+        FILE *output;
+        output = fopen("VMOutput.txt", "w");
 
-            if(output == NULL){
-                printf("ERROR");
+        if(output == NULL){
+            printf("ERROR");
 
-            }
+        }
 
-            // the initial data; convert op codes to keywords
-            fprintf(output, "%s\t%s\t\t%s\t%s\t%s\n", "Line", "OP", "R", "L", "M");
+        fprintf(output, "Initial Values:\t\t\t\t%s\t%s\t%s\t%s\n", "pc", "bp", "sp", "stack");
 
-            for(int i = 0; i<totalSize; i++){
-                traceCode(output, i,code[i]);
-                fprintf(output, "\n");
-            }
-            fprintf(output, "\n");
+        // Runs the program
+        while(!hlt && pc <= totalSize && bp > 0){
+            // fetch
+            ir = code[pc];
+            traceCode(output, pc, ir);
+            pc++;
 
-            fprintf(output, "Initial Values:\t\t\t\t%s\t%s\t%s\t%s\n", "pc", "bp", "sp", "stack");
-
-            // Runs the program
-            while(!hlt && pc <= totalSize && bp > 0){
-                // fetch
-                ir = code[pc];
-                traceCode(output, pc, ir);
-                pc++;
-
-                // execute
-                execute(ir, &pc, &sp, &bp, registers, stack, &hlt, &currentLevel, ARs);
-                printInfo(output, pc,sp,bp, stack, ARs);
-            }
-        } else{
-            printf("File not found\n");
+            // execute
+            execute(ir, &pc, &sp, &bp, registers, stack, &hlt, &currentLevel, ARs);
+            printInfo(output, pc,sp,bp, stack, ARs);
         }
     } else{
-        printf("Incorrect number of arguments. Please submit 1 text file\n");
+        printf("CodeGenOutput.txt not found\n");
     }
+
    return 0;
 }
 

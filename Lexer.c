@@ -35,7 +35,7 @@ typedef struct  {
 
 void findType(symbol * sym, int * level,int *kindFlag);
 
-int main(int argc, char * argv[]){
+int main(){
 
     // I'm going to use the struct for every symbol
     symbol lex_table[MAX_SYMBOLS];
@@ -67,252 +67,242 @@ int main(int argc, char * argv[]){
     int flagIdentInvalid = 0;
     int flagInvalidSym = 0;
 
-    output = fopen("output.txt", "w");
+    output = fopen("LexOutput.txt", "w");
 
-    fprintf(output,"Source Program:\n\n");
+    pl0Code = fopen("Input.txt", "r");
 
-    if(argc == 2){
-        pl0Code = fopen(argv[1], "r");
+    while(!feof(pl0Code) && currentSymbol<MAX_SYMBOLS){
 
-        while(!feof(pl0Code) && currentSymbol<MAX_SYMBOLS){
+        currentChar = fgetc(pl0Code);
 
+        if(currentChar == EOF){
+            break;
+        }
+
+        if(isCommenting && currentChar == '*'){
+            currentChar = fgetc(pl0Code);
+            if(currentChar == EOF){
+                break;
+            }
+
+            if(currentChar == '/'){
+                isCommenting = 0;
+                currentChar = fgetc(pl0Code);
+            }
+
+
+        }
+        if(currentChar == '/' && !isCommenting){
             currentChar = fgetc(pl0Code);
 
             if(currentChar == EOF){
                 break;
             }
 
-            if(isCommenting && currentChar == '*'){
-                currentChar = fgetc(pl0Code);
-                if(currentChar == EOF){
-                    break;
-                }
-
-                if(currentChar == '/'){
-                    isCommenting = 0;
-                    currentChar = fgetc(pl0Code);
-                }
-
-
-            }
-            if(currentChar == '/' && !isCommenting){
-                currentChar = fgetc(pl0Code);
-
-                if(currentChar == EOF){
-                    break;
-                }
-
-                if(currentChar == '*'){
-                    isCommenting = 1;
-                } else{
-                    code[currentSymbol] = '/';
-                    currentSymbol++;
-                    fprintf(output,"/");
-                }
-            }
-
-            if(!isCommenting){
-                code[currentSymbol] = currentChar;
+            if(currentChar == '*'){
+                isCommenting = 1;
+            } else{
+                code[currentSymbol] = '/';
                 currentSymbol++;
-                fprintf(output, "%c", currentChar);
             }
-
         }
 
-        code[currentChar] = '\0';
+        if(!isCommenting){
+            code[currentSymbol] = currentChar;
+            currentSymbol++;
+        }
 
-        fclose(pl0Code);
+    }
 
-        fprintf(output, "\n\n");
+    code[currentChar] = '\0';
 
-        int codeLength = currentSymbol;
+    fclose(pl0Code);
 
-        currentSymbol = 0;
-        currentChar = ' ';
+    int codeLength = currentSymbol;
 
-        for(int i = 0; i<codeLength; i++){
+    currentSymbol = 0;
+    currentChar = ' ';
 
-            if(isalnum(code[i])){
-                   while(i < codeLength && isalnum(code[i])){
-                        if(!isalpha(lex_table[currentSymbol].name[0]) && namePos > MAX_NUM_LENGTH){
-                            flagNumLength = 1;
-                        } else if(namePos >= MAX_IDENT_LENGTH){
-                            flagIdentLength = 1;
-                        }
+    for(int i = 0; i<codeLength; i++){
 
-                        lex_table[currentSymbol].name[namePos] = code[i];
-
-                        if(isalpha(code[i]) && !isalpha(lex_table[currentSymbol].name[0]) ){
-                            flagIdentInvalid = 1;
-                            break;
-                        }
-
-                        namePos++;
-                        i++;
-                   }
-                   if(flagIdentInvalid || flagIdentLength || flagNumLength){
-                        break;
-                   }
-
-                   if(!isalpha(lex_table[currentSymbol].name[0])){
-                        lex_table[currentSymbol].kind = 1;
-                        lex_table[currentSymbol].type = numbersym;
-                        lex_table[currentSymbol].val = atoi(lex_table[currentSymbol].name);
-                        lex_table[currentSymbol].name[5] = '\0';
-
-                        if(kindFlag == 1){
-                            lex_table[currentSymbol-2].val = lex_table[currentSymbol].val;
-                        }
-                   } else{
-                        findType(&lex_table[currentSymbol], &lexLevel, &kindFlag);
-
-                        if(kindFlag != 0){
-                            symbol_table[currentST] = lex_table[currentSymbol];
-                            currentST++;
-                        }
-                   }
-                   if(namePos < MAX_IDENT_LENGTH-1){
-                        lex_table[currentSymbol].name[namePos] = '\0';
-                   }
-                   namePos = 0;
-                   currentSymbol++;
-            }
-            if(code[i] != ' ' && code[i] != '\n' && code[i] != '\t' && code[i] != '\0' && code[i] != '\r'){
-                // check special symbols
-                if(!isalnum(code[i])){
-                    namePos = 0;
+        if(isalnum(code[i])){
+               while(i < codeLength && isalnum(code[i])){
+                    if(!isalpha(lex_table[currentSymbol].name[0]) && namePos > MAX_NUM_LENGTH){
+                        flagNumLength = 1;
+                    } else if(namePos >= MAX_IDENT_LENGTH){
+                        flagIdentLength = 1;
+                    }
 
                     lex_table[currentSymbol].name[namePos] = code[i];
+
+                    if(isalpha(code[i]) && !isalpha(lex_table[currentSymbol].name[0]) ){
+                        flagIdentInvalid = 1;
+                        break;
+                    }
+
                     namePos++;
+                    i++;
+               }
+               if(flagIdentInvalid || flagIdentLength || flagNumLength){
+                    break;
+               }
+
+               if(!isalpha(lex_table[currentSymbol].name[0])){
+                    lex_table[currentSymbol].kind = 1;
+                    lex_table[currentSymbol].type = numbersym;
+                    lex_table[currentSymbol].val = atoi(lex_table[currentSymbol].name);
+                    lex_table[currentSymbol].name[5] = '\0';
+
+                    if(kindFlag == 1){
+                        lex_table[currentSymbol-2].val = lex_table[currentSymbol].val;
+                    }
+               } else{
+                    findType(&lex_table[currentSymbol], &lexLevel, &kindFlag);
+
+                    if(kindFlag != 0){
+                        symbol_table[currentST] = lex_table[currentSymbol];
+                        currentST++;
+                    }
+               }
+               if(namePos < MAX_IDENT_LENGTH-1){
+                    lex_table[currentSymbol].name[namePos] = '\0';
+               }
+               namePos = 0;
+               currentSymbol++;
+        }
+        if(code[i] != ' ' && code[i] != '\n' && code[i] != '\t' && code[i] != '\0' && code[i] != '\r'){
+            // check special symbols
+            if(!isalnum(code[i])){
+                namePos = 0;
+
+                lex_table[currentSymbol].name[namePos] = code[i];
+                namePos++;
+                switch(code[i]){
+                case '+':
+                    lex_table[currentSymbol].type = plussym;
+                    break;
+                case '-':
+                    lex_table[currentSymbol].type = minussym;
+                    break;
+                case '*':
+                    lex_table[currentSymbol].type = multsym;
+                    break;
+                case '/':
+                    lex_table[currentSymbol].type= slashsym;
+                    break;
+                case '=':
+                    lex_table[currentSymbol].type= eqsym;
+                    break;
+                case '<':
+                    i++;
                     switch(code[i]){
-                    case '+':
-                        lex_table[currentSymbol].type = plussym;
-                        break;
-                    case '-':
-                        lex_table[currentSymbol].type = minussym;
-                        break;
-                    case '*':
-                        lex_table[currentSymbol].type = multsym;
-                        break;
-                    case '/':
-                        lex_table[currentSymbol].type= slashsym;
-                        break;
                     case '=':
-                        lex_table[currentSymbol].type= eqsym;
+                        lex_table[currentSymbol].name[namePos] = code[i];
+                        lex_table[currentSymbol].type = leqsym;
+                        namePos++;
                         break;
-                    case '<':
-                        i++;
-                        switch(code[i]){
-                        case '=':
-                            lex_table[currentSymbol].name[namePos] = code[i];
-                            lex_table[currentSymbol].type = leqsym;
-                            namePos++;
-                            break;
-                        case '>':
-                            lex_table[currentSymbol].name[namePos] = code[i];
-                            lex_table[currentSymbol].type = neqsym;
-                            namePos++;
-                            break;
-                        default:
-                            lex_table[currentSymbol].type = lessym;
-                            i--;
-                            break;
-                        }
                     case '>':
-                        i++;
-                        if(code[i]=='='){
-                            lex_table[currentSymbol].name[namePos] = code[i];
-                            lex_table[currentSymbol].type = geqsym;
-                            namePos++;
-                        } else{
-                            lex_table[currentSymbol].type = gtrsym;
-                            i--;
-                        }
-                        break;
-                    case '(':
-                        lex_table[currentSymbol].type = lparentsym;
-                        break;
-                    case ')':
-                        lex_table[currentSymbol].type = rparentsym;
-                        break;
-                    case ',':
-                        lex_table[currentSymbol].type = commasym;
-                        break;
-                    case ';':
-                        lex_table[currentSymbol].type = semicolonsym;
-                        kindFlag = 0;
-                        break;
-                    case '.':
-                        lex_table[currentSymbol].type = periodsym;
-                        break;
-                    case ':':
-                        i++;
-                        if(code[i] == '='){
-                            lex_table[currentSymbol].name[namePos] = code[i];
-                            lex_table[currentSymbol].type = becomessym;
-                            namePos++;
-                        } else{
-                            flagInvalidSym = 1;
-                        }
+                        lex_table[currentSymbol].name[namePos] = code[i];
+                        lex_table[currentSymbol].type = neqsym;
+                        namePos++;
                         break;
                     default:
+                        lex_table[currentSymbol].type = lessym;
+                        i--;
+                        break;
+                    }
+                case '>':
+                    i++;
+                    if(code[i]=='='){
+                        lex_table[currentSymbol].name[namePos] = code[i];
+                        lex_table[currentSymbol].type = geqsym;
+                        namePos++;
+                    } else{
+                        lex_table[currentSymbol].type = gtrsym;
+                        i--;
+                    }
+                    break;
+                case '(':
+                    lex_table[currentSymbol].type = lparentsym;
+                    break;
+                case ')':
+                    lex_table[currentSymbol].type = rparentsym;
+                    break;
+                case ',':
+                    lex_table[currentSymbol].type = commasym;
+                    break;
+                case ';':
+                    lex_table[currentSymbol].type = semicolonsym;
+                    kindFlag = 0;
+                    break;
+                case '.':
+                    lex_table[currentSymbol].type = periodsym;
+                    break;
+                case ':':
+                    i++;
+                    if(code[i] == '='){
+                        lex_table[currentSymbol].name[namePos] = code[i];
+                        lex_table[currentSymbol].type = becomessym;
+                        namePos++;
+                    } else{
                         flagInvalidSym = 1;
-                        break;
                     }
-
-                    if(flagInvalidSym){
-                        break;
-                    }
-
-                    lex_table[currentSymbol].name[namePos] = '\0';
-                    lex_table[currentSymbol].kind = 0;
-                    currentSymbol++;
-                    namePos = 0;
+                    break;
+                default:
+                    flagInvalidSym = 1;
+                    break;
                 }
-            }
 
-        }
+                if(flagInvalidSym){
+                    break;
+                }
 
-
-        // NEED TO REPLACE RETURN 0 WITH ACTUAL ERROR HANDELING
-        if(flagIdentInvalid){
-            printf("ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
-            fprintf(output,"ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
-            return 0;
-        } else if(flagIdentLength){
-            printf("ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
-            fprintf(output, "ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
-            return 0;
-        } else if(flagInvalidSym){
-            printf("ERROR: Invalid symbol: %s\n", lex_table[currentSymbol].name);
-            fprintf(output, "ERROR: Invalid symbol: %s\n", lex_table[currentSymbol].name);
-            return 0;
-        } else if(flagNumLength){
-            printf("ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
-            fprintf(output,"ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
-            return 0;
-        }
-
-        fprintf(output, "Lexeme Table:\n\n");
-
-        for(int i=0; i<currentSymbol; i++){
-            fprintf(output, "%-13s%d\n", lex_table[i].name,lex_table[i].type);
-        }
-
-        fprintf(output, "\n\nLexeme List:\n\n");
-
-        for(int i=0; i<currentSymbol; i++){
-            if(lex_table[i].type == identsym || lex_table[i].type == numbersym){
-                fprintf(output, "%d %s ", lex_table[i].type, lex_table[i].name);
-            }else{
-                fprintf(output, "%d ", lex_table[i].type);
+                lex_table[currentSymbol].name[namePos] = '\0';
+                lex_table[currentSymbol].kind = 0;
+                currentSymbol++;
+                namePos = 0;
             }
         }
 
-        fclose(output);
-    } else{
-        printf("please submit one text file as an argument");
     }
+
+
+    // NEED TO REPLACE RETURN 0 WITH ACTUAL ERROR HANDELING
+    if(flagIdentInvalid){
+        printf("ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
+        fprintf(output,"ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
+        return 0;
+    } else if(flagIdentLength){
+        printf("ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
+        fprintf(output, "ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
+        return 0;
+    } else if(flagInvalidSym){
+        printf("ERROR: Invalid symbol: %s\n", lex_table[currentSymbol].name);
+        fprintf(output, "ERROR: Invalid symbol: %s\n", lex_table[currentSymbol].name);
+        return 0;
+    } else if(flagNumLength){
+        printf("ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
+        fprintf(output,"ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
+        return 0;
+    }
+
+    fprintf(output, "Lexeme Table:\n\n");
+
+    for(int i=0; i<currentSymbol; i++){
+        fprintf(output, "%-13s%d\n", lex_table[i].name,lex_table[i].type);
+    }
+
+    fprintf(output, "\n\nLexeme List:\n\n");
+
+    for(int i=0; i<currentSymbol; i++){
+        if(lex_table[i].type == identsym || lex_table[i].type == numbersym){
+            fprintf(output, "%d %s ", lex_table[i].type, lex_table[i].name);
+        }else{
+            fprintf(output, "%d ", lex_table[i].type);
+        }
+    }
+
+    fclose(output);
 
     return 0;
 }
