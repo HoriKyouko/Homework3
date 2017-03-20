@@ -109,7 +109,7 @@ int main(int argc, char **argv){
     tokenSize = getTokenList(tokens);
     // Stuff from Compiler Driver goes here
     Program(currentNode);
-    
+
     textForVM();
 }
 
@@ -533,7 +533,7 @@ void Factor(node *currentNode){
 }
 
 void emit(int op, int r, int l, int m){
-    
+
     if(codeIndex > MAX_CODE_LENGTH)
         error(25);
 
@@ -759,11 +759,11 @@ int findToken(int token){
 void textForVM(){
     int i = 0;
     FILE *fp;
-    
-    fp = fopen("codeToVM.txt", "w");
-    
+
+    fp = fopen("CodeGenOutput.txt", "w");
+
     for(i = 0; i < codeIndex; i++)
         fprintf(fp, "%d %d %d %d\n", code[i].op, code[i].r, code[i].l, code[i].m);
-    
+
     fclose(fp);
 }
