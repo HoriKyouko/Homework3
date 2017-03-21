@@ -11,7 +11,7 @@ typedef struct node{
     int token;
     struct node *next;
 
-}node;
+} node;
 
 typedef enum {
 
@@ -34,7 +34,7 @@ typedef enum {
 
 typedef struct  {
 
-    int kind; 		// symbol = 0, const = 1, var = 2, proc = 3, keyword = 4;
+    int kind; 		// symbol = 0, const = 1, var = 2, proc = 3
     char name[MAX_IDENT_LENGTH];	// name up to 11 chars
     int val; 		// number (ASCII value)
     int level; 		// L level
@@ -57,11 +57,11 @@ typedef enum{
     variable,
     procedure
 
-}symbolKind;
+} kindOfToken;
 
 // Global Variables needed
 int currentToken;
-int currentReg;
+int currentRegister;
 token tokenTable[MAX_token_TABLE_SIZE]; // Token Table
 token tokens[MAX_token_TABLE_SIZE]; // Token List
 int tokenTableIndex; // Tells us what token we are looking at.
@@ -85,26 +85,26 @@ void Factor(node *currentNode);
 void getNextToken(node *currentNode);
 void error(int error);
 void emit(int op, int r, int l, int m);
-void textForVM()
+void textForVM();
 
 node *createNode(int data);
 node *insertNode(node *head, node *tail, int token);
 
-node *getLexemeList();
+node *getLexList();
 int getTokenList(token *tokenList);
-void addSymbolTable(int kind, int tokenIndex);
+void addTokenTable(int kind, int tokenIndex);
 int findToken(int token);
 
 int main(int argc, char **argv){
     int currentElement, tokenSize;
 
-    currentReg = -1;
+    currentRegister = -1;
     codeIndex = 0;
     level = -1;
     tokenTableIndex = 0;
     node *currentNode, **head;
 
-    currentNode = getLexemeList();
+    currentNode = getLexList();
 
     tokenSize = getTokenList(tokens);
     // Stuff from Compiler Driver goes here
@@ -123,6 +123,8 @@ void Program(node *currentNode){
 
     else
         emit(op_sioh, 0, 0, 3);
+	
+	printf("No errors, program is syntactically correct");
 }
 
 void Block(node *currentNode){
@@ -157,7 +159,7 @@ void Block(node *currentNode){
 }
 
 int ConstDecl(node *currentNode){
-    int count = 0, index, value;
+    int count = 0, pointer, value;
 
     do{
         getNextToken(currentNode);
@@ -166,10 +168,9 @@ int ConstDecl(node *currentNode){
             error(4);
 
         getNextToken(currentNode);
-        index = currentToken;
-        addSymbolTable(constant, index);
+        pointer = currentToken;
+        addTokenTable(constant, pointer);
         count++;
-
         getNextToken(currentNode);
 
         if(currentToken != eqsym){
@@ -185,11 +186,9 @@ int ConstDecl(node *currentNode){
             error(2);
 
         getNextToken(currentNode);
-
-        index = currentToken;
-        value = atoi(tokens[index].name);
+        pointer = currentToken;
+        value = atoi(tokens[pointer].name);
         tokenTable[tokenTableIndex].val = value;
-
         getNextToken(currentNode);
 
     } while(currentToken == commasym);
@@ -203,7 +202,7 @@ int ConstDecl(node *currentNode){
 }
 
 int VarDecl(node *currentNode){
-    int count = 0, index;
+    int count = 0, pointer;
 
     do{
         getNextToken(currentNode);
@@ -212,14 +211,12 @@ int VarDecl(node *currentNode){
             error(4);
 
         getNextToken(currentNode);
-
-        index = currentToken;
-        addSymbolTable(variable, index);
+        pointer = currentToken;
+        addTokenTable(variable, pointer);
         tokenTable[tokenTableIndex].addr = 4 + count;
-
         getNextToken(currentNode);
-
         count++;
+		
     } while(currentToken == commasym);
 
     if(currentToken != semicolonsym)
@@ -231,9 +228,9 @@ int VarDecl(node *currentNode){
 }
 
 int ProcDecl(node *currentNode){
-    int count = 0, index;
+    int count = 0, pointer;
 
-    while(currentToken == procsym){
+    do{
         count++;
         getNextToken(currentNode);
 
@@ -241,12 +238,10 @@ int ProcDecl(node *currentNode){
             error(4);
 
         getNextToken(currentNode);
-
-        index = currentToken;
-        addSymbolTable(procedure, index);
+        pointer = currentToken;
+        addTokenTable(procedure, pointer);
         tokenTable[tokenTableIndex].level = level;
         tokenTable[tokenTableIndex].addr = codeIndex;
-
         getNextToken(currentNode);
 
         if(currentToken != semicolonsym)
@@ -259,22 +254,22 @@ int ProcDecl(node *currentNode){
             error(5);
 
         getNextToken(currentNode);
-    }
+    } while(currentToken == procsym);
+	
     return count;
 }
 
 void Statement(node *currentNode){
-    int temp, codeTemp, index, indexTemp;
+    int temp, codeTemp, pointer, pointerTemp;
 
     if(currentToken == identsym){
         getNextToken(currentNode);
+        pointer = findToken(currentToken);
 
-        index = findToken(currentToken);
-
-        if(index == 0)
+        if(pointer == 0)
             error(11);
 
-        if(tokenTable[index].kind != variable)
+        if(tokenTable[pointer].kind != variable)
             error(12);
 
         getNextToken(currentNode);
@@ -284,8 +279,8 @@ void Statement(node *currentNode){
 
         getNextToken(currentNode);
         Expression(currentNode);
-        emit(op_sto, currentReg, level - tokenTable[index].level, tokenTable[index].addr);
-        currentReg--;
+        emit(op_sto, currentRegister, level - tokenTable[pointer].level, tokenTable[pointer].addr);
+        currentRegister--;
     }// end ident
 
     else if(currentToken == callsym){
@@ -295,16 +290,15 @@ void Statement(node *currentNode){
             error(14);
 
         getNextToken(currentNode);
+        pointer = findToken(currentToken);
 
-        index = findToken(currentToken);
-
-        if(index == 0)
+        if(pointer == 0)
             error(11);
 
-        else if(tokenTable[index].kind != procedure)
+        else if(tokenTable[pointer].kind != procedure)
             error(15);
 
-        emit(op_cal, 0, level - tokenTable[index].level, tokenTable[index].addr);
+        emit(op_cal, 0, level - tokenTable[pointer].level, tokenTable[pointer].addr);
 
         getNextToken(currentNode);
     }// end call
@@ -334,39 +328,25 @@ void Statement(node *currentNode){
             error(16);
 
         getNextToken(currentNode);
-
         temp = codeIndex;
-        emit(op_jpc, currentReg, 0, 0);
-        currentReg--;
+        emit(op_jpc, currentRegister, 0, 0);
+        currentRegister--;
 
         Statement(currentNode);
 
-        if(currentToken == elsesym){
-            getNextToken(currentNode);
-
-            codeTemp = codeIndex;
-            emit(op_jmp, 0, 0,0);
-
-            code[temp].m = codeIndex;
-
-            Statement(currentNode);
-
-            code[codeTemp].m = codeIndex;
-        }
-        else
-            code[temp].m = codeIndex;
+        code[temp].m = codeIndex;
 
     }// end if
 
     else if(currentToken == whilesym){
 
-        indexTemp = codeIndex;
+        pointerTemp = codeIndex;
 
         getNextToken(currentNode);
         Condition(currentNode);
         codeTemp = codeIndex;
 
-        emit(op_jpc, currentReg, 0, 0);
+        emit(op_jpc, currentRegister, 0, 0);
 
         if(currentToken != dosym)
             error(18);
@@ -374,7 +354,7 @@ void Statement(node *currentNode){
         getNextToken(currentNode);
         Statement(currentNode);
 
-        emit(op_jmp, 0, 0, indexTemp);
+        emit(op_jmp, 0, 0, pointerTemp);
 
         code[codeTemp].m = codeIndex;
     }// end while
@@ -384,11 +364,9 @@ void Condition(node *currentNode){
     int op;
 
     if(currentToken == oddsym){
-        getNextToken(currentNode);;
-
+        getNextToken(currentNode);
         Expression(currentNode);
-
-        emit(op_odd, currentReg, 0, 0);
+        emit(op_odd, currentRegister, 0, 0);
     }
 
     else{
@@ -396,15 +374,14 @@ void Condition(node *currentNode){
 
         op = rel_op();
 
-        if(!rel_op())
+        if(op == 0)
             error(20);
 
         getNextToken(currentNode);
-
         Expression(currentNode);
 
-        emit(op, currentReg - 1, currentReg - 1, currentReg);
-        currentReg--;
+        emit(op, currentRegister - 1, currentRegister - 1, currentRegister);
+        currentRegister--;
     }
 }
 
@@ -438,28 +415,25 @@ void Expression(node *currentNode){
     int op;
 
     if(currentToken == plussym || currentToken == minussym){
-
         getNextToken(currentNode);
         Term(currentNode);
-        emit(op_neg, currentReg, currentReg, 0);
-
+        emit(op_neg, currentRegister, currentRegister, 0);
     }
     else
         Term(currentNode);
 
     while(currentToken == plussym || currentToken == minussym){
-
         op = currentToken;
         getNextToken(currentNode);
         Term(currentNode);
 
         if(op == plussym){
-            emit(op_add, currentReg - 1, currentReg - 1, currentReg);
-            currentReg--;
+            emit(op_add, currentRegister - 1, currentRegister - 1, currentRegister);
+            currentRegister--;
         }
         else if(op == minussym){
-            emit(op_sub, currentReg - 1, currentReg - 1, currentReg);
-            currentReg--;
+            emit(op_sub, currentRegister - 1, currentRegister - 1, currentRegister);
+            currentRegister--;
         }
     }
 }
@@ -476,32 +450,31 @@ void Term(node *currentNode){
         Factor(currentNode);
 
         if(op == multsym){
-            emit(op_mul, currentReg - 1, currentReg - 1, currentReg);
-            currentReg--;
+            emit(op_mul, currentRegister - 1, currentRegister - 1, currentRegister);
+            currentRegister--;
         }
         else if(op == slashsym){
-            emit(op_div, currentReg - 1, currentReg - 1, currentReg);
-            currentReg--;
+            emit(op_div, currentRegister - 1, currentRegister - 1, currentRegister);
+            currentRegister--;
         }
     }
 }
 
 void Factor(node *currentNode){
-    int index, value;
+    int pointer, value;
 
     if(currentToken == identsym){
         getNextToken(currentNode);
+        pointer = findToken(currentToken);
+        currentRegister++;
 
-        index = findToken(currentToken);
-        currentReg++;
-
-        if(tokenTable[index].kind == variable)
-            emit(op_lod, currentReg, level - tokenTable[index].level, tokenTable[index].addr);
-
-        else if(tokenTable[index].kind == constant)
-            emit(op_lit, currentReg, 0, tokenTable[index].val);
-
-        else
+        if(tokenTable[pointer].kind == variable)
+            emit(op_lod, currentRegister, level - tokenTable[pointer].level, tokenTable[pointer].addr);
+        
+		else if(tokenTable[pointer].kind == constant)
+            emit(op_lit, currentRegister, 0, tokenTable[pointer].val);
+        
+		else
             error(21);
 
         getNextToken(currentNode);
@@ -509,16 +482,13 @@ void Factor(node *currentNode){
 
     else if(currentToken == numbersym){
         getNextToken(currentNode);
-
         value = atoi(tokens[currentToken].name);
-        currentReg++;
-
-        emit(op_lit, currentReg, 0, value);
+        currentRegister++;
+        emit(op_lit, currentRegister, 0, value);
         getNextToken(currentNode);
     }
 
     else if(currentToken == lparentsym){
-
         getNextToken(currentNode);
         Expression(currentNode);
 
@@ -659,12 +629,12 @@ void error(int error){
 }
 
 node* createNode(int data){
-    node *ptr = (node*)malloc(sizeof(node));
+    node *node = (node*)malloc(sizeof(node));
 
-    ptr->token = data;
-    ptr->next = NULL;
+    node->token = data;
+    node->next = NULL;
 
-    return ptr;
+    return node;
 }
 
 node* insertNode(node *head, node *tail, int token){
@@ -676,14 +646,11 @@ node* insertNode(node *head, node *tail, int token){
         return tail->next;
     }
 }
-node *getLexemeList(){
+node *getLexList(){
     int buffer;
     FILE *fp;
     node *head, *tail;
 
-/* For binary files
-    fp = fopen("lexList.txt", "rb");
-*/
     fp = fopen("lexList.txt", "r");
 
     if(fp == NULL){
@@ -713,7 +680,7 @@ int getTokenList(token *tokenList){
 
     FILE *fp;
 
-    fp = fopen("symTable.txt", "r");
+    fp = fopen("tokenList.txt", "r");
 
     if(fp == NULL){
         printf("Error File doesn't exist.");
@@ -730,14 +697,13 @@ int getTokenList(token *tokenList){
 }
 
 void getNextToken(node *currentNode){
-
     currentToken = currentNode->token;
 
     if(currentNode->next != NULL)
         *currentNode = *currentNode->next;
 }
 
-void addSymbolTable(int kind, int tokenIndex){
+void addTokenTable(int kind, int tokenIndex){
     tokenTableIndex++;
 
     strcpy(tokenTable[tokenTableIndex].name, tokens[tokenIndex].name);
@@ -747,13 +713,13 @@ void addSymbolTable(int kind, int tokenIndex){
 }
 
 int findToken(int token){
-    int location;
+    int i;
 
-    for(location = tokenTableIndex; location > 0; location--)
-        if(strcmp(tokenTable[location].name, tokens[token].name) == 0)
-            return location;
+    for(i = tokenTableIndex; i > 0; i--)
+        if(strcmp(tokenTable[i].name, tokens[token].name) == 0)
+            return i;
 
-    return location;
+    return i;
 }
 
 void textForVM(){
