@@ -352,7 +352,7 @@ void findType(symbol * sym, int * level, int *kindFlag){
     } else if(!strcmp(sym->name, "else")){
         sym->type = elsesym;
         sym->kind = 4;
-    } else if(!strcmp(sym->name, "odd"){
+    } else if(!strcmp(sym->name, "odd")){
         sym->type = oddsym;
         sym->kind = 4;
     } else{

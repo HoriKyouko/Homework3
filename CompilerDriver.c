@@ -41,7 +41,7 @@ int main(int argc, char **argv){
     }
 
     if(printCodeFlag){
-        errorCheck = system("./.exe");
+        errorCheck = system("./Parser.exe");
     }
     if(errorCheck < 0){
         //some kind of error for the code gen program not working
@@ -73,7 +73,7 @@ int main(int argc, char **argv){
 
 void PrintLex(){
     FILE *f;
-    
+
     f = fopen("LexOutput.txt", "r");
 
     char c = getc(f);
@@ -88,11 +88,11 @@ void PrintLex(){
 
 void PrintCode(){
     FILE *f;
-    
+
     f = fopen("CodeGenOutput.txt", "r");
 
     char c = getc(f);
-    
+
     while(c != EOF){
         printf("%c", c);
         c = getc(f);
@@ -103,11 +103,11 @@ void PrintCode(){
 
 void PrintVM(){
     FILE *f;
-    
+
     f = fopen("VMOutput.txt", "r");
 
     char c = getc(f);
-    
+
     while(c != EOF){
         printf("%c", c);
         c = getc(f);
