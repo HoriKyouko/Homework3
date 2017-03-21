@@ -67,7 +67,7 @@ int main(){
     int flagIdentInvalid = 0;
     int flagInvalidSym = 0;
 
-    output = fopen("LexOutput.txt", "w");
+    output = fopen("lexList.txt", "w");
 
     pl0Code = fopen("Input.txt", "r");
 
@@ -285,14 +285,6 @@ int main(){
         fprintf(output,"ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
         return 0;
     }
-
-    fprintf(output, "Lexeme Table:\n\n");
-
-    for(int i=0; i<currentSymbol; i++){
-        fprintf(output, "%-13s%d\n", lex_table[i].name,lex_table[i].type);
-    }
-
-    fprintf(output, "\n\nLexeme List:\n\n");
 
     for(int i=0; i<currentSymbol; i++){
         if(lex_table[i].type == identsym || lex_table[i].type == numbersym){
