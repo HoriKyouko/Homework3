@@ -18,7 +18,7 @@ int main(int argc, char **argv){
 
 
     int i;
-    for(i = 0; i< agc; i++){
+    for(i = 0; i< argc; i++){
         if(!strcmp("-l",argv[i])){
             printLexFlag = 1;
         } else if(!strcmp("-a",argv[i])){
@@ -72,12 +72,14 @@ int main(int argc, char **argv){
 }
 
 void PrintLex(){
-    FILE f = fopen("LexOutput.txt", "r");
+    FILE *f;
+    
+    f = fopen("LexOutput.txt", "r");
 
     char c = getc(f);
 
     while(c != EOF){
-        prtinf("%c", c);
+        printf("%c", c);
         c = getc(f);
     }
 
@@ -85,10 +87,12 @@ void PrintLex(){
 }
 
 void PrintCode(){
-    FILE f = fopen("CodeGenOutput.txt", "r");
+    FILE *f;
+    
+    f = fopen("CodeGenOutput.txt", "r");
 
     while(c != EOF){
-        prtinf("%c", c);
+        printf("%c", c);
         c = getc(f);
     }
 
@@ -96,10 +100,12 @@ void PrintCode(){
 }
 
 void PrintVM(){
-    FILE f = fopen("VMOutput.txt", "r");
+    FILE *f;
+    
+    f = fopen("VMOutput.txt", "r");
 
     while(c != EOF){
-        prtinf("%c", c);
+        printf("%c", c);
         c = getc(f);
     }
 
