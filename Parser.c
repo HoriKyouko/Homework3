@@ -629,12 +629,12 @@ void error(int error){
 }
 
 node* createNode(int data){
-    node *node = (node*)malloc(sizeof(node));
+    node *current = (node*)malloc(sizeof(node));
 
-    node->token = data;
-    node->next = NULL;
+    current->token = data;
+    current->next = NULL;
 
-    return node;
+    return current;
 }
 
 node* insertNode(node *head, node *tail, int token){
