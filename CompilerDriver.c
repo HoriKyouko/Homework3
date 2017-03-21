@@ -91,6 +91,8 @@ void PrintCode(){
     
     f = fopen("CodeGenOutput.txt", "r");
 
+    char c = getc(f);
+    
     while(c != EOF){
         printf("%c", c);
         c = getc(f);
@@ -104,6 +106,8 @@ void PrintVM(){
     
     f = fopen("VMOutput.txt", "r");
 
+    char c = getc(f);
+    
     while(c != EOF){
         printf("%c", c);
         c = getc(f);
