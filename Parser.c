@@ -69,6 +69,7 @@ int tokenTableIndex;
 instruction code[MAX_CODE_LENGTH];
 int level;
 int codeIndex;
+int varCounter;
 
 // Function declarations
 void Program(node *currentNode);
@@ -103,11 +104,11 @@ int main(int argc, char **argv){
     level = -1;
     tokenTableIndex = 0;
     node *currentNode;
-    // Creates our LinkedList from the Lexer programs output.
-    currentNode = getLexList();
     // Populates our tokens array with the symbols.
     getTokenList(tokens);
-
+    // Creates our LinkedList from the Lexer programs output.
+    currentNode = getLexList();
+    // Call our Program procedure.
     Program(currentNode);
     // Prints out our code we generated.
     textForVM();
@@ -643,6 +644,10 @@ void error(int error){
             printf("25. This number is too large.");
             break;
 
+        case 26:
+            printf("26. Unknown variable or constant found");
+            break;
+
         default:
             printf("Unknown error");
             break;
@@ -671,7 +676,8 @@ node* insertNode(node *head, node *tail, int token){
 }
 // Function that gets our Lexical List we made in the Lexer code.
 node *getLexList(){
-    int buffer;
+    int buffer, i;
+    char temp [MAX_IDENT_LENGTH + 1];
     FILE *fp;
     node *head, *tail;
     // Opens the text file for reading.
@@ -692,6 +698,55 @@ node *getLexList(){
     while(fscanf(fp, "%d", &buffer) != EOF){
         tail = insertNode(head, tail, buffer);
         tail->token = buffer;
+        // Check if the token is going to be a variable.
+        if(buffer == 2){
+            // Scan the variable name.
+            fscanf(fp, "%s", temp);
+            // Loop through checking if we've already added the variable to the temp array.
+            for(i = 0; i < varCounter; i++){
+                // In case we fill up our table and are still looking for if i is in the array. If it reaches above the
+                // max size and still has not been placed then we know that it could go in, but do to limitations
+                // we will not allow it to go in.
+                if(i > MAX_token_TABLE_SIZE)
+                    error(25);
+                // If we have already added the variable to the list then we just add the variable to the tail
+                // and break out of the loop.
+                if (strcmp(tokens[i].name, temp) == 0) {
+                    tail = insertNode(head, tail, i);
+                    tail->token = i;
+                    break;
+                }
+                // If we still have not found the variable by the time we've searched the entire array. Then we must
+                // have found an unknown variable and we throw an error. Should never happen, but good to be safe.
+                if (i == varCounter - 1){
+                    error(26);
+                }
+            }
+        }
+        else if(buffer == 3){
+            // Scan the constant.
+            fscanf(fp, "%s", temp);
+            // Loop through checking if we've already added the constant to the temp array.
+            for(i = 0; i < varCounter; i++){
+                // In case we fill up our table and are still looking for if i is in the array. If it reaches above the
+                // max size and still has not been placed then we know that it could go in, but do to limitations
+                // we will not allow it to go in.
+                if(i > MAX_token_TABLE_SIZE)
+                    error(25);
+                // If we have already added the constant to the list then we just add the constant to the tail
+                // and break out of the loop.
+                if (strcmp(tokens[i].name, temp) == 0) {
+                    tail = insertNode(head, tail, i);
+                    tail->token = i;
+                    break;
+                }
+                // If we still have not found the constant by the time we've searched the entire array. Then we must
+                // have found an unknown constant and we throw an error. Should never happen, but good to be safe.
+                if (i == varCounter - 1) {
+                    error(26);
+                }
+            }
+        }
     }
 
     fclose(fp);
@@ -701,9 +756,9 @@ node *getLexList(){
 // Function to fill the symbol table.
 void getTokenList(token *tokenList){
     char buffer[MAX_IDENT_LENGTH + 1];
-    int count = 0;
-
     FILE *fp;
+    // Set where we want our counter to be at.
+    varCounter = 0;
     //Opens our text file to read.
     fp = fopen("tokenList.txt", "r");
     // Standard error checking.
@@ -713,10 +768,11 @@ void getTokenList(token *tokenList){
     }
     // While were not at the end of the file we copy the buffer into the tokenList and increment count.
     while(fscanf(fp, "%s", buffer) != EOF){
-        strcpy(tokenList[count].name, buffer);
-        count++;
+        strcpy(tokenList[varCounter].name, buffer);
+        varCounter++;
     }
-
+    // Gives us our final amount of variables we have in our tokenList.
+    varCounter++;
     fclose(fp);
 }
 // Gets the next token in the LinkedList.
