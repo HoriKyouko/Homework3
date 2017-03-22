@@ -34,6 +34,8 @@ typedef struct  {
 } symbol;
 
 void findType(symbol * sym, int * level,int *kindFlag);
+int AddSymbol(char * name,int * numSym, symbol * sym_tab);
+char * TextType(int type);
 
 int main(){
 
@@ -44,13 +46,14 @@ int main(){
     char code[MAX_CODE_LENGTH];
 
     FILE *pl0Code;
-    FILE *output;
+    FILE *lexOutput;
+    FILE *symOutput;
+    FILE *tokText;
 
     // initially refers the character form the code being recorded
     // then, to the current symbol being recorded
     int currentSymbol = 0;
-    // current position in the symbol table array
-    int currentST = 0;
+
     char currentChar = ' ';
 
     int isCommenting = 0;
@@ -61,13 +64,13 @@ int main(){
 
     int kindFlag = 0;
 
+    int numSymbols = 0;
+
     // error flags
     int flagNumLength = 0;
     int flagIdentLength = 0;
     int flagIdentInvalid = 0;
     int flagInvalidSym = 0;
-
-    output = fopen("lexList.txt", "w");
 
     pl0Code = fopen("Input.txt", "r");
 
@@ -123,7 +126,9 @@ int main(){
     currentSymbol = 0;
     currentChar = ' ';
 
-    for(int i = 0; i<codeLength; i++){
+    int i;
+
+    for(i = 0; i<codeLength; i++){
 
         if(isalnum(code[i])){
                while(i < codeLength && isalnum(code[i])){
@@ -158,12 +163,12 @@ int main(){
                     }
                } else{
                     findType(&lex_table[currentSymbol], &lexLevel, &kindFlag);
-
-                    if(kindFlag != 0){
-                        symbol_table[currentST] = lex_table[currentSymbol];
-                        currentST++;
-                    }
                }
+
+                if(lex_table[currentSymbol].kind != 4){
+                    numSymbols = AddSymbol(lex_table[currentSymbol].name, &numSymbols, symbol_table);
+                }
+
                if(namePos < MAX_IDENT_LENGTH-1){
                     lex_table[currentSymbol].name[namePos] = '\0';
                }
@@ -266,35 +271,57 @@ int main(){
 
     }
 
-
+    lexOutput = fopen("lexList.txt", "w");
     // NEED TO REPLACE RETURN 0 WITH ACTUAL ERROR HANDELING
     if(flagIdentInvalid){
         printf("ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
-        fprintf(output,"ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
+        fprintf(lexOutput,"ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
         return 0;
     } else if(flagIdentLength){
         printf("ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
-        fprintf(output, "ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
+        fprintf(lexOutput, "ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
         return 0;
     } else if(flagInvalidSym){
         printf("ERROR: Invalid symbol: %s\n", lex_table[currentSymbol].name);
-        fprintf(output, "ERROR: Invalid symbol: %s\n", lex_table[currentSymbol].name);
+        fprintf(lexOutput, "ERROR: Invalid symbol: %s\n", lex_table[currentSymbol].name);
         return 0;
     } else if(flagNumLength){
         printf("ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
-        fprintf(output,"ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
+        fprintf(lexOutput,"ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
         return 0;
     }
 
-    for(int i=0; i<currentSymbol; i++){
+    for(i=0; i<currentSymbol; i++){
         if(lex_table[i].type == identsym || lex_table[i].type == numbersym){
-            fprintf(output, "%d %s ", lex_table[i].type, lex_table[i].name);
+            fprintf(lexOutput, "%d %s ", lex_table[i].type, lex_table[i].name);
         }else{
-            fprintf(output, "%d ", lex_table[i].type);
+            fprintf(lexOutput, "%d ", lex_table[i].type);
         }
     }
 
-    fclose(output);
+    fclose(lexOutput);
+
+    // print symbol table
+    symOutput = fopen("symbolList.txt", "w");
+
+    for(i = 0; i<numSymbols; i++){
+        fprintf(symOutput, "%s ", symbol_table[i].name);
+    }
+
+    fclose(symOutput);
+
+    tokText = fopen("tokenTypeText.txt", "w");
+    // print lex list in text
+    for(i=0; i<currentSymbol; i++){
+        if(lex_table[i].type == identsym || lex_table[i].type == numbersym){
+            fprintf(tokText, "%s %s ", TextType(lex_table[i].type), lex_table[i].name);
+        }else{
+            fprintf(tokText, "%s ", TextType(lex_table[i].type));
+        }
+    }
+
+    fclose(tokText);
+
 
     return 0;
 }
@@ -358,4 +385,127 @@ void findType(symbol * sym, int * level, int *kindFlag){
         }
     }
 
+}
+
+int AddSymbol(char * name,int * numSym, symbol * sym_tab){
+    int i = 0;
+
+    for(i; i<*numSym; i++){
+        if(!strcmp(sym_tab[i].name, name)){
+            return *numSym;
+        }
+    }
+
+    strcpy(sym_tab[i].name, name);
+    return i+1;
+}
+
+char * TextType(int type){
+    char* typeName = malloc(14);
+    switch(type){
+    case 1:
+        strcpy(typeName, "nulsym");
+        break;
+    case 2:
+        strcpy(typeName, "identsym");
+        break;
+    case 3:
+        strcpy(typeName, "numbersym");
+        break;
+    case 4:
+        strcpy(typeName, "plussym");
+        break;
+    case 5:
+        strcpy(typeName, "minussym");
+        break;
+    case 6:
+        strcpy(typeName, "multsym");
+        break;
+    case 7:
+        strcpy(typeName, "slashsym");
+        break;
+    case 8:
+        strcpy(typeName, "oddsym");
+        break;
+    case 9:
+        strcpy(typeName, "eqsym");
+        break;
+    case 10:
+        strcpy(typeName, "neqsym");
+        break;
+    case 11:
+        strcpy(typeName, "lessym");
+        break;
+    case 12:
+        strcpy(typeName, "leqsym");
+        break;
+    case 13:
+        strcpy(typeName, "gtrsym");
+        break;
+    case 14:
+        strcpy(typeName, "geqsym");
+        break;
+    case 15:
+        strcpy(typeName, "lparentsym");
+        break;
+    case 16:
+        strcpy(typeName, "rparentsym");
+        break;
+    case 17:
+        strcpy(typeName, "commasym");
+        break;
+    case 18:
+        strcpy(typeName, "semicolonsym");
+        break;
+    case 19:
+        strcpy(typeName, "periodsym");
+        break;
+    case 20:
+        strcpy(typeName, "becomessym");
+        break;
+    case 21:
+        strcpy(typeName, "beginsym");
+        break;
+    case 22:
+        strcpy(typeName, "endsym");
+        break;
+    case 23:
+        strcpy(typeName, "ifsym");
+        break;
+    case 24:
+        strcpy(typeName, "thensym");
+        break;
+    case 25:
+        strcpy(typeName, "whilesym");
+        break;
+    case 26:
+        strcpy(typeName, "dosym");
+        break;
+    case 27:
+        strcpy(typeName, "callsym");
+        break;
+    case 28:
+        strcpy(typeName, "constsym");
+        break;
+    case 29:
+        strcpy(typeName, "varsym");
+        break;
+    case 30:
+        strcpy(typeName, "procsym");
+        break;
+    case 31:
+        strcpy(typeName, "writesym");
+        break;
+    case 32:
+        strcpy(typeName, "readsym");
+        break;
+    case 33:
+        strcpy(typeName, "elsesym");
+        break;
+    default:
+        strcpy(typeName, "invalidsym");
+        break;
+    }
+
+    return typeName;
 }
