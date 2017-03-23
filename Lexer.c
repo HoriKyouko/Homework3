@@ -72,9 +72,9 @@ int main(){
     int flagIdentInvalid = 0;
     int flagInvalidSym = 0;
 
-    pl0Code = fopen("Input.txt", "r");
+    pl0Code = fopen("input.txt", "r");
 
-    while(!feof(pl0Code) && currentSymbol<MAX_SYMBOLS){
+    while(!feof(pl0Code) && currentSymbol < MAX_SYMBOLS){
 
         currentChar = fgetc(pl0Code);
 
@@ -110,7 +110,7 @@ int main(){
             }
         }
 
-        if(!isCommenting){
+        if(!isCommenting && currentChar >= 0){
             code[currentSymbol] = currentChar;
             currentSymbol++;
         }
@@ -175,7 +175,7 @@ int main(){
                namePos = 0;
                currentSymbol++;
         }
-        if(code[i] != ' ' && code[i] != '\n' && code[i] != '\t' && code[i] != '\0' && code[i] != '\r'){
+        if(code[i] != ' ' && code[i] != '\n' && code[i] != '\t' && code[i] != '\0' && code[i] != '\r' && i<codeLength){
             // check special symbols
             if(!isalnum(code[i])){
                 namePos = 0;
@@ -272,23 +272,23 @@ int main(){
     }
 
     lexOutput = fopen("lexList.txt", "w");
-    // NEED TO REPLACE RETURN 0 WITH ACTUAL ERROR HANDELING
+    
     if(flagIdentInvalid){
         printf("ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
         fprintf(lexOutput,"ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
-        return 0;
+        exit(1);
     } else if(flagIdentLength){
         printf("ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
         fprintf(lexOutput, "ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
-        return 0;
+        exit(1);
     } else if(flagInvalidSym){
-        printf("ERROR: Invalid symbol: %s\n", lex_table[currentSymbol].name);
-        fprintf(lexOutput, "ERROR: Invalid symbol: %s\n", lex_table[currentSymbol].name);
-        return 0;
+        printf("ERROR: Invalid symbol: %d\n", lex_table[currentSymbol].name[0]);
+        fprintf(lexOutput, "ERROR: Invalid symbol: %d\n", lex_table[currentSymbol].name[0]);
+        exit(1);
     } else if(flagNumLength){
         printf("ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
         fprintf(lexOutput,"ERROR: Invalid number; length exceeds %d digits.\n", MAX_NUM_LENGTH);
-        return 0;
+        exit(1);
     }
 
     for(i=0; i<currentSymbol; i++){
@@ -302,7 +302,7 @@ int main(){
     fclose(lexOutput);
 
     // print symbol table
-    symOutput = fopen("symbolList.txt", "w");
+    symOutput = fopen("tokenList.txt", "w");
 
     for(i = 0; i<numSymbols; i++){
         fprintf(symOutput, "%s ", symbol_table[i].name);
