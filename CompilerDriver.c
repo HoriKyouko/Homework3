@@ -18,65 +18,51 @@ int main(int argc, char **argv){
 
 
     int i;
-    for(i = 0; i< argc; i++){
-        if(!strcmp("-l",argv[i])){
+    for(i = 0; i < argc; i++){
+        if(strcmp("-l",argv[i]) == 0){
             printLexFlag = 1;
-        } else if(!strcmp("-a",argv[i])){
+        } else if(strcmp("-a",argv[i]) == 0){
             printCodeFlag = 1;
-        } else if(!strcmp("-v",argv[i])){
+        } else if(strcmp("-v",argv[i]) == 0){
             printVMFlag = 1;
         }
     }
 
     int errorCheck = 0;
 
+	errorCheck = system("./Lexer1.exe");
+	if(errorCheck != 0){
+        	//some kind of error for the lexer program not working
+		printf("\nGOT a lexer error.\n");
+        	printLexFlag = 0;
+        	errorCheck = 0;
+		exit(1);
+    	}
     if(printLexFlag){
-        errorCheck = system("./Lexer.exe");
+	PrintLex();
     }
-    if(errorCheck < 0){
-        //some kind of error for the lexer program not working
-
-        printLexFlag = 0;
-        errorCheck = 0;
+	errorCheck = system("./Parser1.exe");
+	if(errorCheck != 0){
+        	//some kind of error for the code gen program not working
+		printf("\nGOT a parser error.\n");
+        	printCodeFlag = 0;
+        	errorCheck = 0;
+		exit(1);
+    	}
+    if(printCodeFlag){    
+	// It must be ok so we print out the Lexers Output.
+    	PrintCode();
     }
-
-    if(printCodeFlag){
-        errorCheck = system("./Parser.exe");
-    }
-    if(errorCheck < 0){
-        //some kind of error for the code gen program not working
-
-        printCodeFlag = 0;
-        errorCheck = 0;
-    }
-
+	errorCheck = system("./VirtualMachine1.exe");
+	if(errorCheck != 0){
+        	//some kind of error for the virtual machine program not working
+		printf("\nGOT a VM error.\n");
+        	printVMFlag = 0;
+        	errorCheck = 0;
+		exit(1);
+    	}
     if(printVMFlag){
-        errorCheck = system("./VirtualMachine.exe");
-    }
-
-    if(errorCheck < 0){
-        //some kind of error for the virtual machine program not working
-
-        printVMFlag = 0;
-        errorCheck = 0;
-    }
-
-    printf("\n\n");
-
-    if(printLexFlag){
-        PrintLex();
-    }
-
-    printf("\n\n");
-
-    if(printCodeFlag){
-        PrintCode();
-    }
-
-    printf("\n\n");
-
-    if(printVMFlag){
-        PrintVM();
+	PrintVM();
     }
 }
 
@@ -84,28 +70,36 @@ void PrintLex(){
     FILE *f;
 
     f = fopen("lexList.txt", "r");
-
+    if(f == NULL){
+    	printf("We could not open the lexList.txt file! Exiting the program.\n");
+	exit(1);
+    }
     char c = getc(f);
 
     while(c != EOF){
         printf("%c", c);
         c = getc(f);
     }
-
-    fclose(f);
-
     printf("\n\n");
 
-    f = fopen("tokenTypeText.txt", "r");
+    fclose(f);
+    
+    FILE *fp = fopen("tokenTypeText.txt", "r");
 
-    c = getc(f);
-
-    while(c != EOF){
-        printf("%c", c);
-        c = getc(f);
+    if(fp == NULL){
+    	printf("We could not open the tokenTypeText.txt file! Exiting the program.\n");
+	exit(1);
     }
 
-    fclose(f);
+    c = getc(fp);
+
+    while(c != EOF){
+	printf("%c", c);
+	c = getc(fp);
+    }
+    printf("\n\n");
+
+    fclose(fp);
 }
 
 void PrintCode(){
@@ -113,12 +107,18 @@ void PrintCode(){
 
     f = fopen("CodeGenOutput.txt", "r");
 
+    if(f == NULL){
+    	printf("We could not open the CodeGenOutput.txt file! Exiting the program.\n");
+	exit(1);
+    }
+
     char c = getc(f);
 
     while(c != EOF){
         printf("%c", c);
         c = getc(f);
     }
+    printf("\n\n");
 
     fclose(f);
 }
@@ -127,6 +127,10 @@ void PrintVM(){
     FILE *f;
 
     f = fopen("VMOutput.txt", "r");
+    if(f == NULL){
+	printf("We could not open the VMOutput.txt file! Exiting the program.\n");
+	exit(1);
+    }
 
     char c = getc(f);
 
@@ -134,6 +138,6 @@ void PrintVM(){
         printf("%c", c);
         c = getc(f);
     }
-
+    printf("\n\n");
     fclose(f);
 }
