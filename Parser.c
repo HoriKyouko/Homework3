@@ -76,7 +76,6 @@ void Program(node *currentNode);
 void Block(node *currentNode);
 int ConstDecl(node *currentNode);
 int VarDecl(node *currentNode);
-int ProcDecl(node *currentNode);
 void Statement(node *currentNode);
 void Condition(node *currentNode);
 int rel_op();
@@ -144,9 +143,7 @@ void Block(node *currentNode){
         variables = VarDecl(currentNode);
     // We add space determined by how many variables we have added.
     space += variables;
-
-    if(currentToken ==  procsym)
-        procedures = ProcDecl(currentNode);
+    
     // We then make the code offset set to the line we are working on in the code, and call the emit function for
     // the INC call.
     code[jump].m = codeIndex;
@@ -231,39 +228,6 @@ int VarDecl(node *currentNode){
 
     getNextToken(currentNode);
     // Return how many variables we have.
-    return count;
-}
-// The Procedure Declaration Variable.
-int ProcDecl(node *currentNode){
-    int count = 0, pointer;
-
-    do{
-        getNextToken(currentNode);
-        // If our token is not an identifier call an error.
-        if(currentToken != identsym)
-            error(4);
-
-        getNextToken(currentNode);
-        pointer = currentToken;
-        addTokenTable(procedure, pointer);
-        tokenTable[tokenTableIndex].level = level;
-        tokenTable[tokenTableIndex].addr = codeIndex;
-        getNextToken(currentNode);
-        count++;
-        // If our token is not a semicolon we throw an error.
-        if(currentToken != semicolonsym)
-            error(5);
-        // We then call for our next token in the linked list and then call our Block function since, we are calling
-        // a procedure and this procedure may have constants, variables, procedures, or statements in it.
-        getNextToken(currentNode);
-        Block(currentNode);
-        // Token isn't a semicolon throw an error.
-        if(currentToken != semicolonsym)
-            error(5);
-
-        getNextToken(currentNode);
-    } while(currentToken == procsym);
-    // Return how many procedures we called.
     return count;
 }
 // The Statement procedure.
