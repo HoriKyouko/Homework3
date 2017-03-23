@@ -126,7 +126,7 @@ void Program(node *currentNode){
     else
         emit(op_sioh, 0, 0, 3);
     // If we get here then we had no errors.
-    printf("No errors, program is syntactically correct");
+    printf("No errors, program is syntactically correct.\n\n");
 }
 // The Block procedure for our Parser.
 void Block(node *currentNode){
@@ -760,7 +760,7 @@ void getTokenList(token *tokenList){
     // Set where we want our counter to be at.
     varCounter = 0;
     //Opens our text file to read.
-    fp = fopen("symbolList.txt", "r");
+    fp = fopen("tokenList.txt", "r");
     // Standard error checking.
     if(fp == NULL){
         printf("Error File doesn't exist.");
