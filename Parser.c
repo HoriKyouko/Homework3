@@ -760,7 +760,7 @@ void getTokenList(token *tokenList){
     // Set where we want our counter to be at.
     varCounter = 0;
     //Opens our text file to read.
-    fp = fopen("tokenList.txt", "r");
+    fp = fopen("symbolList.txt", "r");
     // Standard error checking.
     if(fp == NULL){
         printf("Error File doesn't exist.");

@@ -24,7 +24,7 @@ int main(int argc, char **argv){
         } else if(!strcmp("-a",argv[i])){
             printCodeFlag = 1;
         } else if(!strcmp("-v",argv[i])){
-                printVMFlag = 1;
+            printVMFlag = 1;
         }
     }
 
@@ -53,6 +53,7 @@ int main(int argc, char **argv){
     if(printVMFlag){
         errorCheck = system("./VirtualMachine.exe");
     }
+
     if(errorCheck < 0){
         //some kind of error for the virtual machine program not working
 
@@ -60,12 +61,20 @@ int main(int argc, char **argv){
         errorCheck = 0;
     }
 
+    printf("\n\n");
+
     if(printLexFlag){
         PrintLex();
     }
+
+    printf("\n\n");
+
     if(printCodeFlag){
         PrintCode();
     }
+
+    printf("\n\n");
+
     if(printVMFlag){
         PrintVM();
     }
@@ -74,9 +83,22 @@ int main(int argc, char **argv){
 void PrintLex(){
     FILE *f;
 
-    f = fopen("LexOutput.txt", "r");
+    f = fopen("lexList.txt", "r");
 
     char c = getc(f);
+
+    while(c != EOF){
+        printf("%c", c);
+        c = getc(f);
+    }
+
+    fclose(f);
+
+    printf("\n\n");
+
+    f = fopen("tokenTypeText.txt", "r");
+
+    c = getc(f);
 
     while(c != EOF){
         printf("%c", c);

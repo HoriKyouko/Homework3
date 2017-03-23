@@ -69,7 +69,7 @@ int main(int argc, char * argv[]){
 
         }
 
-        fprintf(output, "Initial Values:\t\t\t\t%s\t%s\t%s\t%s\n", "pc", "bp", "sp", "stack");
+        fprintf(output, "Initial Values:\t\t\t\t\t%s\t%s\t%s\t%s\n", "pc", "bp", "sp", "stack");
 
         // Runs the program
         while(!hlt && pc <= totalSize && bp > 0){
@@ -81,6 +81,17 @@ int main(int argc, char * argv[]){
             // execute
             execute(ir, &pc, &sp, &bp, registers, stack, &hlt, &currentLevel, ARs);
             printInfo(output, pc,sp,bp, stack, ARs);
+        }
+
+        fprintf(output, "\nRegisters:\n");
+
+        int i;
+
+        for(i = 0; i<MAX_REGISTERS; i++){
+            fprintf(output, "R%d: %d ", i, registers[i]);
+            if((i+1) % 8 == 0){
+                fprintf(output, "\n");
+            }
         }
     } else{
         printf("CodeGenOutput.txt not found\n");
@@ -343,6 +354,6 @@ void traceCode(FILE * f, int line, instruction current){
             printf("Faulty instruction\n");
             return;
 	}
-	fprintf(f, "%d\t\t%s\t%c\t%d\t%d\t%d", line, instr, space,current.r,current.l, current.m);
+	fprintf(f, "%d\t%s\t%c\t%d\t%d\t%d", line, instr, space,current.r,current.l, current.m);
 	return;
 }
