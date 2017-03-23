@@ -30,7 +30,7 @@ int main(int argc, char **argv){
 
     int errorCheck = 0;
 
-	errorCheck = system("./Lexer1.exe");
+	errorCheck = system("./Lexer.exe");
 	if(errorCheck != 0){
         	//some kind of error for the lexer program not working
 		printf("\nGOT a lexer error.\n");
@@ -41,7 +41,7 @@ int main(int argc, char **argv){
     if(printLexFlag){
 	PrintLex();
     }
-	errorCheck = system("./Parser1.exe");
+	errorCheck = system("./Parser.exe");
 	if(errorCheck != 0){
         	//some kind of error for the code gen program not working
 		printf("\nGOT a parser error.\n");
@@ -53,7 +53,7 @@ int main(int argc, char **argv){
 	// It must be ok so we print out the Lexers Output.
     	PrintCode();
     }
-	errorCheck = system("./VirtualMachine1.exe");
+	errorCheck = system("./VirtualMachine.exe");
 	if(errorCheck != 0){
         	//some kind of error for the virtual machine program not working
 		printf("\nGOT a VM error.\n");
