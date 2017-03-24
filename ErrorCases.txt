@@ -1,0 +1,249 @@
+/*
+I'm not sure how this needs to be formatted. But Here are a series of 
+pl0 programs that will cause errors to be called in our program
+*/
+
+/* Parser Errors: */
+
+/* ================================================================== */
+
+/* Error: 1. Used = instead of :=. */
+
+var x, y;
+
+begin
+	x := y + 56;
+end.
+
+
+/* Error: 2. = must be followed by a number. */
+
+const toot = potato;
+var x, y;
+
+begin
+	x := y + 56;
+end.
+
+
+/* Error: 3. Identifier must be followed by =. */
+
+const toot potato;
+var x, y;
+
+begin
+	x := y + 56;
+end.
+
+
+/* Error: 4. const, var, procedure must be followed by identifier. */
+
+const 4;
+var x, y;
+
+begin
+	x := y + 56;
+end.
+
+
+/* Error: 5. Semicolon or comma missing. */
+
+const toot = 4;
+var x y;
+
+begin
+	x := y + 56;
+end.
+
+/* for semicolon: */
+
+const toot = 4;
+var x, y
+
+begin
+	x := y + 56;
+end.
+
+
+/* Error: 9. Period expected. */
+
+const toot = 4;
+var x, y;
+
+begin
+	x := y + 56;
+end
+
+
+/* Error: 11. Undeclared identifier */
+
+const toot = 4;
+var x, y;
+
+begin
+	x := z + 56;
+end.
+
+
+/* Error: 11. Undeclared identifier */
+
+const toot = 4;
+var x, y;
+
+begin
+	x := z + 56;
+end.
+
+
+/* Error: 12. Assignment to constant or procedure is not allowed */
+
+const toot = 4;
+var x, y;
+
+begin
+
+	toot = 6;
+	x := y + 56;
+end.
+
+
+/* Error: 13. Assignment operator expected */
+
+const toot = 4;
+var x, y;
+
+begin
+	x y + 56;
+end.
+
+
+/* Error: 16. then expected. */
+
+const toot = 4;
+var x, y;
+
+begin
+	x := y + 56 + toot;
+	if
+		x = 60
+
+end.
+
+
+/* Error: 17. Semicolon or } expected. */
+
+const toot = 4;
+var x, y;
+
+begin
+	x := y + 56 + toot
+	y: = 1;
+
+end.
+
+/* Error: 18. do expected. */
+
+const toot = 4;
+var x, y;
+
+begin
+
+	x := y + 56 + toot;
+	y: = 1;
+	
+	while x <> 25
+	
+end.
+
+
+/* Error: 20. Relational operator expected. */
+
+const toot = 4;
+var x, y;
+
+begin
+
+	x := y + 56 + toot;
+	y: = 1;
+	
+	while x 25
+	do x:= x - y;
+	
+end.
+
+
+/* Error: 22. Right parenthesis missing. */
+
+const toot = 4;
+var x, y;
+
+begin
+
+	x := y + (56 + toot;
+	
+end.
+
+/* Error: 1. Used := instead of =. */
+
+const toot := 4;
+var x, y;
+
+begin
+
+	x := y + 56;
+	
+end.
+
+
+/* Lexer Errors: */
+
+/* ================================================================== */
+
+/* ERROR: Invalid identifier: %s; identifier must start with a letter */
+
+const toot = 4;
+var x, y, 4poot;
+
+begin
+
+	x := y + 56;
+	
+end.
+
+
+/* ERROR: Invalid identifier; length of %s exceeds 11 characters */
+
+const toot = 4;
+var x, y, supercalifragilisticexpialidocious;
+
+begin
+
+	x := y + 56;
+	
+end.
+
+
+/* ERROR: Invalid symbol: %c */
+
+const toot = 4;
+var x, y;
+
+begin
+
+@
+
+	x := y + 56;
+	
+end.
+
+
+/* ERROR: Invalid number; length exceeds 5 digits. */
+
+const toot = 4;
+var x, y;
+
+begin
+
+	x := y + 56565656;
+	
+end.

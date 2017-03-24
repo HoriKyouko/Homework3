@@ -6,6 +6,10 @@
 #define MAX_CODE_LENGTH 500
 #define MAX_IDENT_LENGTH 11
 
+// Parser for pl0 compiler
+// Timothy
+// James Williamson
+
 // Each individual node holds one of the tokens in a link list fashion.
 typedef struct node{
 

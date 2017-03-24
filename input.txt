@@ -1,3 +1,5 @@
+/*Must Be Renamed input.txt*/
+
 const toot = 4;
 var x, y;
 

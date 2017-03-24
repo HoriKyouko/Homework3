@@ -19,9 +19,9 @@ readsym , elsesym
 } token_type;
 
 
-// For constants, you must store kind, name and value.
-// For variables, you must store kind, name, L and M.
-// For procedures, you must store kind, name, L and M.
+// Lexer for pl0 compiler
+// Timothy
+// James Williamson
 
 // I'm using this for all symbols and words.
 typedef struct  {
@@ -55,11 +55,12 @@ int main(){
     int currentSymbol = 0;
 
     char currentChar = ' ';
-
+    // flag for comments
     int isCommenting = 0;
     // Counter for the name array in the struct
     int namePos = 0;
 
+    // lexelevel and kindflag may be more relevant for the next project. don;t do much now
     int lexLevel = 0;
 
     int kindFlag = 0;
@@ -74,6 +75,11 @@ int main(){
 
     pl0Code = fopen("input.txt", "r");
 
+    if(pl0Code == NULL){
+        printf("ERROR: input.txt not found");
+        exit(1);
+    }
+
     while(!feof(pl0Code) && currentSymbol < MAX_SYMBOLS){
 
         currentChar = fgetc(pl0Code);
@@ -82,6 +88,7 @@ int main(){
             break;
         }
 
+        // check for the end of a comment
         if(isCommenting && currentChar == '*'){
             currentChar = fgetc(pl0Code);
             if(currentChar == EOF){
@@ -95,6 +102,7 @@ int main(){
 
 
         }
+        // check for the beginning of the comment
         if(currentChar == '/' && !isCommenting){
             currentChar = fgetc(pl0Code);
 
@@ -131,11 +139,18 @@ int main(){
     for(i = 0; i<codeLength; i++){
 
         if(isalnum(code[i])){
+
                while(i < codeLength && isalnum(code[i])){
+                    // If the string starts with a number (i.e. hasn't been flagged as an invalid
+                    // identifier), then check the length of the string and flag if it's too large
+                    // for a number.
+                    // Otherwise check if it is too large for an identifier.
                     if(!isalpha(lex_table[currentSymbol].name[0]) && namePos > MAX_NUM_LENGTH){
                         flagNumLength = 1;
+                        break;
                     } else if(namePos >= MAX_IDENT_LENGTH){
                         flagIdentLength = 1;
+                        break;
                     }
 
                     lex_table[currentSymbol].name[namePos] = code[i];
@@ -148,10 +163,13 @@ int main(){
                     namePos++;
                     i++;
                }
+
+               // break out of the for loop if there are any errors.
                if(flagIdentInvalid || flagIdentLength || flagNumLength){
                     break;
                }
 
+                // set up the type/kind/etc. for a number. Not really sued currently
                if(!isalpha(lex_table[currentSymbol].name[0])){
                     lex_table[currentSymbol].kind = 1;
                     lex_table[currentSymbol].type = numbersym;
@@ -165,10 +183,12 @@ int main(){
                     findType(&lex_table[currentSymbol], &lexLevel, &kindFlag);
                }
 
+                // add the string to the symbol table
                 if(lex_table[currentSymbol].kind != 4){
                     numSymbols = AddSymbol(lex_table[currentSymbol].name, &numSymbols, symbol_table);
                 }
 
+                // add the end string symbol
                if(namePos < MAX_IDENT_LENGTH-1){
                     lex_table[currentSymbol].name[namePos] = '\0';
                }
@@ -283,7 +303,7 @@ int main(){
         fprintf(lexOutput, "ERROR: Invalid identifier; length of %s exceeds %d characters\n", lex_table[currentSymbol].name, MAX_IDENT_LENGTH);
         exit(1);
     } else if(flagInvalidSym){
-        printf("ERROR: Invalid symbol: %d\n", lex_table[currentSymbol].name[0]);
+        printf("ERROR: Invalid symbol: %c\n", lex_table[currentSymbol].name[0]);
         fprintf(lexOutput, "ERROR: Invalid symbol: %d\n", lex_table[currentSymbol].name[0]);
         exit(1);
     } else if(flagNumLength){
@@ -292,6 +312,7 @@ int main(){
         exit(1);
     }
 
+    // print lex list
     for(i=0; i<currentSymbol; i++){
         if(lex_table[i].type == identsym || lex_table[i].type == numbersym){
             fprintf(lexOutput, "%d %s ", lex_table[i].type, lex_table[i].name);
@@ -388,9 +409,11 @@ void findType(symbol * sym, int * level, int *kindFlag){
 
 }
 
+// Add an identifier or number to the symbol table if it is not already in there
 int AddSymbol(char * name,int * numSym, symbol * sym_tab){
     int i = 0;
 
+    // check for duplicates
     for(i; i<*numSym; i++){
         if(!strcmp(sym_tab[i].name, name)){
             return *numSym;

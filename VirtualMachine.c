@@ -6,8 +6,9 @@
 #define MAX_LEXI_LEVELS 3
 #define MAX_REGISTERS 16
 
+// Virtual Machine for Pl0 Compiler
+// Timothy
 // James Williamson
-// pl/0 compiler/virtual machine
 
 typedef struct {
 int op;		// op code
@@ -64,12 +65,7 @@ int main(int argc, char * argv[]){
         FILE *output;
         output = fopen("VMOutput.txt", "w");
 
-        if(output == NULL){
-            printf("ERROR");
-
-        }
-
-        fprintf(output, "Initial Values:\t\t\t\t\t%s\t%s\t%s\t%s\n", "pc", "bp", "sp", "stack");
+        fprintf(output, "Initial Values:\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", "r", "l", "m", "pc", "bp", "sp", "stack");
 
         // Runs the program
         while(!hlt && pc <= totalSize && bp > 0){

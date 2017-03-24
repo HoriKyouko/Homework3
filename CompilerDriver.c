@@ -2,7 +2,9 @@
 #include <string.h>
 #include <stdio.h>
 
-// Still needs to be improved
+// Compiler Driver for pl0 compiler
+// Timothy
+// James Williamson
 
 void PrintLex();
 void PrintCode();
@@ -16,59 +18,67 @@ int main(int argc, char **argv){
     // flag to print the virtual machine execution trace
     int printVMFlag = 0;
 
-
+    // Loop to check for -l, -a, and -v argument in command line
     int i;
-    for(i = 0; i < argc; i++){
+    for(i = 1; i < argc; i++){
         if(strcmp("-l",argv[i]) == 0){
             printLexFlag = 1;
         } else if(strcmp("-a",argv[i]) == 0){
             printCodeFlag = 1;
         } else if(strcmp("-v",argv[i]) == 0){
             printVMFlag = 1;
+        } else{
+            printf("\nArgument %s not recognized. The program will still run, but may not give the desired output\n\n", argv[i]);
         }
     }
 
     int errorCheck = 0;
 
+    // Run the lexer. if it returns something other than a 0, quit the program.
 	errorCheck = system("./Lexer.exe");
 	if(errorCheck != 0){
-        	//some kind of error for the lexer program not working
 		printf("\nGOT a lexer error.\n");
         	printLexFlag = 0;
         	errorCheck = 0;
 		exit(1);
-    	}
-    if(printLexFlag){
-	PrintLex();
     }
+    // If -l was input, print the lexer output
+    if(printLexFlag){
+        PrintLex();
+    }
+
+    // Run the parser. If anything other than 0 is returned, quit the program.
 	errorCheck = system("./Parser.exe");
 	if(errorCheck != 0){
-        	//some kind of error for the code gen program not working
 		printf("\nGOT a parser error.\n");
         	printCodeFlag = 0;
         	errorCheck = 0;
 		exit(1);
-    	}
-    if(printCodeFlag){    
-	// It must be ok so we print out the Lexers Output.
+    }
+    // if -a was input, print out the assembly code
+    if(printCodeFlag){
     	PrintCode();
     }
+
+    // Run the virtual machine. If anything other than 0 is returned, quit the program.
 	errorCheck = system("./VirtualMachine.exe");
 	if(errorCheck != 0){
-        	//some kind of error for the virtual machine program not working
 		printf("\nGOT a VM error.\n");
         	printVMFlag = 0;
         	errorCheck = 0;
 		exit(1);
-    	}
+    }
+    // if -v was input, print out the stack from the virtual machine.
     if(printVMFlag){
-	PrintVM();
+        PrintVM();
     }
 }
 
+// functions to print from files, character by character.
 void PrintLex(){
     FILE *f;
 
+    // lexeme list
     f = fopen("lexList.txt", "r");
     if(f == NULL){
     	printf("We could not open the lexList.txt file! Exiting the program.\n");
@@ -83,7 +93,8 @@ void PrintLex(){
     printf("\n\n");
 
     fclose(f);
-    
+
+    // text version of lexeme list
     FILE *fp = fopen("tokenTypeText.txt", "r");
 
     if(fp == NULL){
@@ -105,6 +116,7 @@ void PrintLex(){
 void PrintCode(){
     FILE *f;
 
+    // assembly code
     f = fopen("CodeGenOutput.txt", "r");
 
     if(f == NULL){
@@ -126,6 +138,7 @@ void PrintCode(){
 void PrintVM(){
     FILE *f;
 
+    // stack trace
     f = fopen("VMOutput.txt", "r");
     if(f == NULL){
 	printf("We could not open the VMOutput.txt file! Exiting the program.\n");
