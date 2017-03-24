@@ -1,4 +1,4 @@
-const toot := 4;
+const toot = 4;
 var x, y;
 
 begin
