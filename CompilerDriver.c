@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 // Compiler Driver for pl0 compiler
-// Timothy
+// Timothy Garrett
 // James Williamson
 
 void PrintLex();

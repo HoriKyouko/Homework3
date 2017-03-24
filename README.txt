@@ -1,5 +1,5 @@
 James Williamson
-Timothy "Doesn't use his real name on Facebook" Lastname
+Timothy Garrett
 
 # Homework3
 Our project for Homework3 involving PL/0 Compiler driver, Parser, and Intermediate Code Generator

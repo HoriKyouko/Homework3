@@ -20,7 +20,7 @@ readsym , elsesym
 
 
 // Lexer for pl0 compiler
-// Timothy
+// Timothy Garrett
 // James Williamson
 
 // I'm using this for all symbols and words.

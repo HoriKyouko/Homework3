@@ -7,7 +7,7 @@
 #define MAX_REGISTERS 16
 
 // Virtual Machine for Pl0 Compiler
-// Timothy
+// Timothy Garrett
 // James Williamson
 
 typedef struct {

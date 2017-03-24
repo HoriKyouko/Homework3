@@ -7,7 +7,7 @@
 #define MAX_IDENT_LENGTH 11
 
 // Parser for pl0 compiler
-// Timothy
+// Timothy Garrett
 // James Williamson
 
 // Each individual node holds one of the tokens in a link list fashion.
