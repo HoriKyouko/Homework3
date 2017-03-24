@@ -216,6 +216,7 @@ int main(){
                         i--;
                         break;
                     }
+                    break;
                 case '>':
                     i++;
                     if(code[i]=='='){
@@ -272,7 +273,7 @@ int main(){
     }
 
     lexOutput = fopen("lexList.txt", "w");
-    
+
     if(flagIdentInvalid){
         printf("ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);
         fprintf(lexOutput,"ERROR: Invalid identifier: %s; identifier must start with a letter", lex_table[currentSymbol].name);

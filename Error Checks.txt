@@ -1,0 +1,49 @@
+* means that it's working. if no *, it should have notes nexted to it
+
+*1 - Used "=" instead of ":=" : Found errors, but fixed. checked
+*2 - '=' must be followed by a number : checked
+*3 - Identifier must be followed by "=" : checked
+*4 - Const, var, proc declaration must be followed by an identifyer : checked
+*5 - Semicolon or comma missing : semicolon checked, comma checked
+6 - Incorrect symbol after procedure declaration --- maybe remove this since procedures are out? untested.
+7 - Statement expected --- this is not called anywhere in the program...I'm not sure where it would go
+8 - Incorrect symbol after statement part in block. -- not called anywhere; not sure where to put it. Seems to be the same as error 9 for this grammar?
+*9 - Period missing after end : checked
+10 - Semicolon between statements missing -- not called, seems redundant with errors 5 and 17
+*11 - Undeclared identifier : checked
+*12 - Assignment to constant or procedure is not allowed : checked;  
+*13 - Assignment operator expected : checked
+14 - Call must be followed by an identifier -- call is used with proceures
+15 - Call of a constant or variable is meaningless -- cal is used with procedures
+*16 - "then" expected : checked
+*17 - Semicolon or } expected -- curley brackets are not in this grammar. Semicolon error does not seem to go through
+	This error does not go through if the statement before "end" is missing a semicolon. However, this does appear 
+	to be allowed in the grammar. I'll mark is as checked for now.
+*18 - do expected : checked
+19 - incorrect symbol following statement -- seems to be the same as 17? Not called in the program.
+*20 - Relational operator expected : checked
+21 - Expression must not contain a procedure identifier -- procedures are out
+*22 - Right parenthesis missing checked
+23 - The preceding factor cannot begin with this symbol -- seems like it is for the next project. NIt's in the program, but I haven't tested it.
+24 - An expression cannot begin with this symbol -- same as above. not called
+*25 - This number is too large -- should be trigerred in the lexer : checked
+*26 - Unknown variable or constant found -- for some reason, 21 was used in the place of this : checked
+
+new errors:
+27 - ':=' used when '=' should be used
+
+Maybe:
+-When varaibles are declared before constants. Maybe this is for the next one since it requires look-ahead
+
+Misc testing notes:
+I'm concerned that the stack isn't showing quite what it needs to be showing. It seems like things are stored in the registers more
+than on the stack. Although maybe what he's been showing in class is the version without the registers? The program still works fine. (I think) 
+	-nevermind, stack looks fine.
+
+Some errors appear to be looking for a lack of symbol (17, 5, etc) while others look for an incorrect symbol (19, 8, etc). Currently, there 
+is no way to differentiate the two. Maybe these are for hw 4?  
+
+for some reason, the lexer is reading <> as gtrsym instead of neqsym.
+	ffffffuuuuuuu let a switch case slip through without a break...3 fairly major errors in my parser now
+
+Ok, analysis complete for now. I recommend using the new input file since it's a bit more robust.

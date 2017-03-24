@@ -143,7 +143,7 @@ void Block(node *currentNode){
         variables = VarDecl(currentNode);
     // We add space determined by how many variables we have added.
     space += variables;
-    
+
     // We then make the code offset set to the line we are working on in the code, and call the emit function for
     // the INC call.
     code[jump].m = codeIndex;
@@ -176,7 +176,7 @@ int ConstDecl(node *currentNode){
         // but if it isn't then we still throw an error but its a different error.
         if(currentToken != eqsym){
             if(currentToken == becomessym)
-                error(1);
+                error(27);
             else
                 error(3);
         }
@@ -247,8 +247,13 @@ void Statement(node *currentNode){
 
         getNextToken(currentNode);
         // If our token is not a becomessym we throw an error.
-        if(currentToken != becomessym)
-            error(13);
+        if(currentToken != becomessym){
+            if(currentToken == eqsym){
+                error(1);
+            } else{
+                error(13);
+            }
+        }
         // We get our next token and call the Expression procedure. Once were done with the Expression Procedure we then
         // output our Store command via the emit function. We also free up the register we were currently using.
         getNextToken(currentNode);
@@ -460,7 +465,7 @@ void Factor(node *currentNode){
             emit(op_lit, currentRegister, 0, tokenTable[pointer].val);
         // If its anything else we throw an error.
         else
-            error(21);
+            error(26);
 
         getNextToken(currentNode);
     }
@@ -486,7 +491,7 @@ void Factor(node *currentNode){
     }
     // If it is neither of the three possibilities then we throw an error.
     else
-        error(24);
+        error(23);
 }
 // Our emit function.
 void emit(int op, int r, int l, int m){
@@ -509,7 +514,7 @@ void error(int error){
     switch(error){
 
         case 1:
-            printf("1. Use = instead of :=.");
+            printf("1. Used = instead of :=.");
             break;
 
         case 2:
@@ -610,6 +615,10 @@ void error(int error){
 
         case 26:
             printf("26. Unknown variable or constant found");
+            break;
+
+        case 27:
+            printf("1. Used := instead of =.");
             break;
 
         default:

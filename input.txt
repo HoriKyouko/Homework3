@@ -1,4 +1,19 @@
+const toot := 4;
 var x, y;
+
 begin
-	x := y + 56;
+	x := y + 56 + toot;
+	if
+		x = 60
+	then
+		x := x/2;
+
+	y := 1;
+
+	while x <> 25
+	do x:= x - y;
+	
+	if y <= 2
+	then y := 12;
+	
 end.
