@@ -1,3 +1,7 @@
+// Lexer for pl0 compiler
+// Timothy Garrett
+// James Williamson
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -17,11 +21,6 @@ periodsym, becomessym, beginsym, endsym, ifsym, thensym,
 whilesym, dosym, callsym, constsym, varsym, procsym, writesym,
 readsym , elsesym
 } token_type;
-
-
-// Lexer for pl0 compiler
-// Timothy Garrett
-// James Williamson
 
 // I'm using this for all symbols and words.
 typedef struct  {
