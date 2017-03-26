@@ -1,3 +1,7 @@
+// Parser for pl0 compiler
+// Timothy Garrett
+// James Williamson
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,10 +9,6 @@
 #define MAX_token_TABLE_SIZE 500
 #define MAX_CODE_LENGTH 500
 #define MAX_IDENT_LENGTH 11
-
-// Parser for pl0 compiler
-// Timothy Garrett
-// James Williamson
 
 // Each individual node holds one of the tokens in a link list fashion.
 typedef struct node{
