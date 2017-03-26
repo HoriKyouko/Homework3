@@ -71,7 +71,7 @@ int main(int argc, char **argv){
         PrintVM();
 	
     if(!printLexFlag && !printCodeFlag && !printVMFlag)
-    	printf("\n\nin              out");
+    	printf("\n\nin              out\n");
 }
 
 // functions to print from files, character by character.
