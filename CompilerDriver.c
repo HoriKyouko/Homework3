@@ -43,9 +43,8 @@ int main(int argc, char **argv){
 		exit(1);
     }
     // If -l was input, print the lexer output
-    if(printLexFlag){
+    if(printLexFlag)
         PrintLex();
-    }
 
     // Run the parser. If anything other than 0 is returned, quit the program.
 	errorCheck = system("./Parser.exe");
@@ -56,9 +55,8 @@ int main(int argc, char **argv){
 		exit(1);
     }
     // if -a was input, print out the assembly code
-    if(printCodeFlag){
+    if(printCodeFlag)
     	PrintCode();
-    }
 
     // Run the virtual machine. If anything other than 0 is returned, quit the program.
 	errorCheck = system("./VirtualMachine.exe");
@@ -69,9 +67,11 @@ int main(int argc, char **argv){
 		exit(1);
     }
     // if -v was input, print out the stack from the virtual machine.
-    if(printVMFlag){
+    if(printVMFlag)
         PrintVM();
-    }
+	
+    if(!printLexFlag && !printCodeFlag && !printVMFlag)
+    	printf("\n\nin              out");
 }
 
 // functions to print from files, character by character.
