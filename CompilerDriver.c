@@ -1,10 +1,10 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
 // Compiler Driver for pl0 compiler
 // Timothy Garrett
 // James Williamson
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 void PrintLex();
 void PrintCode();
