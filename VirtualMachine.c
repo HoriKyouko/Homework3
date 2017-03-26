@@ -1,3 +1,7 @@
+// Virtual Machine for Pl0 Compiler
+// Timothy Garrett
+// James Williamson
+
 #include <stdio.h>
 #include <string.h>
 
@@ -5,10 +9,6 @@
 #define MAX_CODE_LENGTH 500
 #define MAX_LEXI_LEVELS 3
 #define MAX_REGISTERS 16
-
-// Virtual Machine for Pl0 Compiler
-// Timothy Garrett
-// James Williamson
 
 typedef struct {
 int op;		// op code
