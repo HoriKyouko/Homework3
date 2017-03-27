@@ -2,7 +2,8 @@ James Williamson
 Timothy Garrett
 
 # Homework3
-Our project for Homework3 involving PL/0 Compiler driver, Parser, and Intermediate Code Generator
+Our project for Homework3 involving PL/0 Compiler driver, Parser, and Intermediate Code Generator, as well as revised versions of our old
+Lexer and Virtual Machine projects.
 
 Compile instructions:
 
