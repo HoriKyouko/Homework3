@@ -74,12 +74,14 @@ instruction code[MAX_CODE_LENGTH];
 int level;
 int codeIndex;
 int varCounter;
+int errorFlag;
 
 // Function declarations
 void Program(node *currentNode);
 void Block(node *currentNode);
 int ConstDecl(node *currentNode);
 int VarDecl(node *currentNode);
+int ProcDecl(node *currentNode);
 void Statement(node *currentNode);
 void Condition(node *currentNode);
 int rel_op();
@@ -129,7 +131,8 @@ void Program(node *currentNode){
     else
         emit(op_sioh, 0, 0, 3);
     // If we get here then we had no errors.
-    printf("No errors, program is syntactically correct.\n\n");
+	if(errorFlag != 1)
+		printf("No errors, program is syntactically correct.\n\n");
 }
 // The Block procedure for our Parser.
 void Block(node *currentNode){
@@ -148,6 +151,8 @@ void Block(node *currentNode){
     // We add space determined by how many variables we have added.
     space += variables;
 
+	if(currentToken == procsym)
+		procedures = ProcDecl(currentNode);
     // We then make the code offset set to the line we are working on in the code, and call the emit function for
     // the INC call.
     code[jump].m = codeIndex;
@@ -234,6 +239,39 @@ int VarDecl(node *currentNode){
     // Return how many variables we have.
     return count;
 }
+// The Procedure Declaration Variable.
+int ProcDecl(node *currentNode){
+    int count = 0, pointer;
+
+    do{
+        getNextToken(currentNode);
+        // If our token is not an identifier call an error.
+        if(currentToken != identsym)
+            error(4);
+
+        getNextToken(currentNode);
+        pointer = currentToken;
+        addTokenTable(procedure, pointer);
+        tokenTable[tokenTableIndex].level = level;
+        tokenTable[tokenTableIndex].addr = codeIndex;
+        getNextToken(currentNode);
+        count++;
+        // If our token is not a semicolon we throw an error.
+        if(currentToken != semicolonsym)
+            error(5);
+        // We then call for our next token in the linked list and then call our Block function since, we are calling
+        // a procedure and this procedure may have constants, variables, procedures, or statements in it.
+        getNextToken(currentNode);
+        Block(currentNode);
+        // Token isn't a semicolon throw an error.
+        if(currentToken != semicolonsym)
+            error(5);
+
+        getNextToken(currentNode);
+    } while(currentToken == procsym);
+    // Return how many procedures we called.
+    return count;
+}
 // The Statement procedure.
 void Statement(node *currentNode){
     int temp, codeTemp, pointer, pointerTemp;
@@ -317,9 +355,23 @@ void Statement(node *currentNode){
         currentRegister--;
 
         Statement(currentNode);
-        // The area we are currently at is marked with the codeIndex so we know where to return from our jump.
-        code[temp].m = codeIndex;
-    }
+		// If our token is an else symbol. 
+		if(currentToken == elsesym){
+			// We get our next token and hold our index in our codeTemp variable and emit the jmp op code
+            getNextToken(currentNode);
+            codeTemp = codeIndex;
+            emit(op_jmp, 0, 0,0);
+			// Our offset at temp gets the code line
+            code[temp].m = codeIndex;
+			// We call our statement function.
+            Statement(currentNode);
+			// Our code line is stored in codeTemp as the offset. 
+            code[codeTemp].m = codeIndex;
+        }
+        // Else the area we are currently at is marked with the codeIndex so we know where to return from our jump.
+		else
+            code[temp].m = codeIndex;
+	}
     // If our token is an while symbol.
     else if(currentToken == whilesym){
         // Our pointerTemp holds our position in the code.
@@ -629,8 +681,8 @@ void error(int error){
             printf("Unknown error");
             break;
     }
+	errorFlag = 1;
     printf("\n");
-    exit(1);
 }
 // Creates all our nodes. When called it creates a single node and returns it.
 node* createNode(int data){
