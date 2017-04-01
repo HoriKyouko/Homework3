@@ -7,7 +7,7 @@
 
 #define MAX_STACK_HEIGHT 2000
 #define MAX_CODE_LENGTH 500
-#define MAX_LEXI_LEVELS 3
+#define MAX_LEXI_LEVELS 5
 #define MAX_REGISTERS 16
 
 typedef struct {
@@ -65,7 +65,7 @@ int main(int argc, char * argv[]){
         FILE *output;
         output = fopen("VMOutput.txt", "w");
 
-        fprintf(output, "Initial Values:\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", "r", "l", "m", "pc", "bp", "sp", "stack");
+        fprintf(output, "Initial Values:\t\t%s\t%s\t%s\t%s\t%s\t%s\t %s\n", "r", "l", "m", "pc", "bp", "sp", "stack");
 
         // Runs the program
         while(!hlt && pc <= totalSize && bp > 0){
@@ -99,16 +99,17 @@ int main(int argc, char * argv[]){
 // Prints the stack
 void printInfo(FILE * f, int pc, int sp, int bp, int* stack, int*ARs){
     int j = 1;
-    fprintf(f, "\t%d\t%d\t%d   ", pc, bp, sp);
+    fprintf(f, "\t%d\t%d\t%d\t", pc, bp, sp);
     for(int i = 1; i<=sp; i++){
         // AR separater
-        if(i>1 && i == ARs[j] && bp < sp){
+        if(i>1 && i == ARs[j]){
             fprintf(f, " |");
             j++;
         }
         fprintf(f, " %d", stack[i]);
     }
     fprintf(f, "\n");
+    //for(int i = 0; i<)
 
 }
 

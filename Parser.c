@@ -76,6 +76,8 @@ int codeIndex;
 int varCounter;
 int errorFlag;
 
+int tokenNum;
+
 // Function declarations
 void Program(node *currentNode);
 void Block(node *currentNode);
@@ -106,6 +108,7 @@ int main(int argc, char **argv){
     // Initializing our values and creating our nodes.
     currentRegister = -1;
     codeIndex = 0;
+    tokenNum = 0;
     level = -1;
     tokenTableIndex = 0;
     node *currentNode;
@@ -250,6 +253,7 @@ int ProcDecl(node *currentNode){
             error(4);
 
         getNextToken(currentNode);
+
         pointer = currentToken;
         addTokenTable(procedure, pointer);
         tokenTable[tokenTableIndex].level = level;
@@ -355,7 +359,7 @@ void Statement(node *currentNode){
         currentRegister--;
 
         Statement(currentNode);
-		// If our token is an else symbol. 
+		// If our token is an else symbol.
 		if(currentToken == elsesym){
 			// We get our next token and hold our index in our codeTemp variable and emit the jmp op code
             getNextToken(currentNode);
@@ -365,7 +369,7 @@ void Statement(node *currentNode){
             code[temp].m = codeIndex;
 			// We call our statement function.
             Statement(currentNode);
-			// Our code line is stored in codeTemp as the offset. 
+			// Our code line is stored in codeTemp as the offset.
             code[codeTemp].m = codeIndex;
         }
         // Else the area we are currently at is marked with the codeIndex so we know where to return from our jump.
@@ -393,6 +397,48 @@ void Statement(node *currentNode){
         emit(op_jmp, 0, 0, pointerTemp);
         // We determine our offset by the codeIndex.
         code[codeTemp].m = codeIndex;
+    } else if(currentToken == readsym){
+        getNextToken(currentNode);
+
+        if(currentToken != identsym)
+            error(11);
+
+        getNextToken(currentNode);
+        pointer = findToken(currentToken);
+
+        if(tokenTable[pointer].kind != variable)
+            error(28);
+
+        currentRegister++;
+        // generate code to read to the current register
+        emit(op_sior, currentRegister, 0, 2);
+        // store the value that was read
+        emit(op_sto, currentRegister, level-tokenTable[pointer].level, tokenTable[pointer].addr);
+        currentRegister--;
+
+
+        getNextToken(currentNode);
+
+    } else if(currentToken == writesym){
+         getNextToken(currentNode);
+
+        if(currentToken != identsym)
+            error(11);
+
+        getNextToken(currentNode);
+        pointer = findToken(currentToken);
+
+        if(tokenTable[pointer].kind != variable)
+            error(28);
+
+        currentRegister++;
+        // load the current register
+        emit(op_lod, currentRegister, level-tokenTable[pointer].level, tokenTable[pointer].addr);
+        // create code to print to screen
+        emit(op_siop, currentRegister, 0, 1);
+        currentRegister--;
+
+        getNextToken(currentNode);
     }
 }
 // Our Condition procedure.
@@ -570,111 +616,115 @@ void error(int error){
     switch(error){
 
         case 1:
-            printf("1. Used = instead of :=.");
+            printf("1. Used = instead of :=. Code index: %d", tokenNum);
             break;
 
         case 2:
-            printf("2. = must be followed by a number.");
+            printf("2. = must be followed by a number. Code index: %d", tokenNum);
             break;
 
         case 3:
-            printf("3. Identifier must be followed by =.");
+            printf("3. Identifier must be followed by =. Code index: %d", tokenNum);
             break;
 
         case 4:
-            printf("4. const, var, procedure must be followed by identifier.");
+            printf("4. const, var, procedure must be followed by identifier. Code index: %d", tokenNum);
             break;
 
         case 5:
-            printf("5. Semicolon or comma missing.");
+            printf("5. Semicolon or comma missing. Code index: %d", tokenNum);
             break;
 
         case 6:
-            printf("6. Incorrect symbol after procedure declaration");
+            printf("6. Incorrect symbol after procedure declaration. Code index: %d", tokenNum);
             break;
 
         case 7:
-            printf("7. Statement expected");
+            printf("7. Statement expected. Code index: %d", tokenNum);
             break;
 
         case 8:
-            printf("8. Incorrect symbol after statement part in block.");
+            printf("8. Incorrect symbol after statement part in block. Code index: %d", tokenNum);
             break;
 
         case 9:
-            printf("9. Period expected.");
+            printf("9. Period expected. Code index: %d", tokenNum);
             break;
 
         case 10:
-            printf("10. Semicolon between statements missing.");
+            printf("10. Semicolon between statements missing. Code index: %d", tokenNum);
             break;
 
         case 11:
-            printf("11. Undeclared identifier");
+            printf("11. Undeclared identifier. Code index: %d", tokenNum);
             break;
 
         case 12:
-            printf("12. Assignment to constant or procedure is not allowed");
+            printf("12. Assignment to constant or procedure is not allowed. Code index: %d", tokenNum);
             break;
 
         case 13:
-            printf("13. Assignment operator expected");
+            printf("13. Assignment operator. Code index: %d", tokenNum);
             break;
 
         case 14:
-            printf("14. Call must be followed by an identifier.");
+            printf("14. Call must be followed by an identifier. Code index: %d", tokenNum);
             break;
 
         case 15:
-            printf("15. Call of a constant or variable is meaningless.");
+            printf("15. Call of a constant or variable is meaningless. Code index: %d", tokenNum);
             break;
 
         case 16:
-            printf("16. then expected.");
+            printf("16. then expected. Code index: %d", tokenNum);
             break;
 
         case 17:
-            printf("17. Semicolon or } expected.");
+            printf("17. Semicolon or } expected. Code index: %d", tokenNum);
             break;
 
         case 18:
-            printf("18. do expected.");
+            printf("18. do expected. Code index: %d", tokenNum);
             break;
 
         case 19:
-            printf("19. Incorrect symbol following statement.");
+            printf("19. Incorrect symbol following statement. Code index: %d", tokenNum);
             break;
 
         case 20:
-            printf("20. Relational operator expected.");
+            printf("20. Relational operator expected. Code index: %d", tokenNum);
             break;
 
         case 21:
-            printf("21. Expression must not contain a procedure identifier.");
+            printf("21. Expression must not contain a procedure identifier. Code index: %d", tokenNum);
             break;
 
         case 22:
-            printf("22. Right parenthesis missing.");
+            printf("22. Right parenthesis missing. Code index: %d", tokenNum);
             break;
 
         case 23:
-            printf("23. The preceding factor cannot begin with this symbol.");
+            printf("23. The preceding factor cannot begin with this symbol. Code index: %d", tokenNum);
             break;
 
         case 24:
-            printf("24. An expression cannot begin with this symbol.");
+            printf("24. An expression cannot begin with this symbol. Code index: %d", tokenNum);
             break;
 
         case 25:
-            printf("25. This number is too large.");
+            printf("25. This number is too large. Code index: %d", tokenNum);
             break;
 
         case 26:
-            printf("26. Unknown variable or constant found");
+            printf("26. Unknown variable or constant found. Code index: %d", tokenNum);
             break;
 
         case 27:
-            printf("1. Used := instead of =.");
+            printf("27. Used := instead of =. Code index: %d", tokenNum);
+            break;
+
+        case 28:
+            printf("28. Invalid identifier for read or write, must use a variable. Code index: %d", tokenNum);
             break;
 
         default:
@@ -811,6 +861,8 @@ void getNextToken(node *currentNode){
     // So long as we are not at the end of the LinkedList we move the node forward.
     if(currentNode->next != NULL)
         *currentNode = *currentNode->next;
+
+    tokenNum++;
 }
 // Function that adds the tokens to the tokenTable.
 void addTokenTable(int kind, int tokenIndex){
