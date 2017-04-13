@@ -339,6 +339,8 @@ void Statement(node *currentNode){
             getNextToken(currentNode);
             Statement(currentNode);
         }
+	    // Maybe this was the reason it gave the error if not look deeper.
+	// getNextToken(currentNode); 
         // If our token is not an end symbol we throw an error.
         if(currentToken != endsym)
             error(17);
