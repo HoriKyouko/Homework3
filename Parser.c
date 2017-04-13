@@ -399,7 +399,7 @@ void Statement(node *currentNode){
         emit(op_jmp, 0, 0, pointerTemp);
         // We determine our offset by the codeIndex.
         code[codeTemp].m = codeIndex;
-    } 
+    }
 	// If our token is a read symbol.
 	else if(currentToken == readsym){
         getNextToken(currentNode);
@@ -423,11 +423,11 @@ void Statement(node *currentNode){
 		// Get the next token.
         getNextToken(currentNode);
 
-    } 
+    }
 	// If our token is a write symbol.
 	else if(currentToken == writesym){
         getNextToken(currentNode);
-		// check to see if the token is an identsym else throw an error. 
+		// check to see if the token is an identsym else throw an error.
         if(currentToken != identsym)
             error(11);
 		// Get our next token and set pointer to the value of where our token is in the table.
@@ -572,6 +572,8 @@ void Factor(node *currentNode){
         // If the tokenTable kind is a constant we emit the LIT command.
         else if(tokenTable[pointer].kind == constant)
             emit(op_lit, currentRegister, 0, tokenTable[pointer].val);
+        else if(tokenTable[pointer].kind == variable)
+            error(21);
         // If its anything else we throw an error.
         else
             error(26);
@@ -623,115 +625,117 @@ void error(int error){
     switch(error){
 
         case 1:
-            printf("1. Used = instead of :=. Code index: %d", tokenNum);
+            printf("1. Used = instead of :=.");
             break;
 
         case 2:
-            printf("2. = must be followed by a number. Code index: %d", tokenNum);
+            printf("2. = must be followed by a number.");
             break;
 
         case 3:
-            printf("3. Identifier must be followed by =. Code index: %d", tokenNum);
+            printf("3. Identifier must be followed by =.");
             break;
 
         case 4:
-            printf("4. const, var, procedure must be followed by identifier. Code index: %d", tokenNum);
+            printf("4. const, var, procedure must be followed by identifier.");
+
+
             break;
 
         case 5:
-            printf("5. Semicolon or comma missing. Code index: %d", tokenNum);
+            printf("5. Semicolon or comma missing.");
             break;
 
         case 6:
-            printf("6. Incorrect symbol after procedure declaration. Code index: %d", tokenNum);
+            printf("6. Incorrect symbol after procedure declaration.");
             break;
 
         case 7:
-            printf("7. Statement expected. Code index: %d", tokenNum);
+            printf("7. Statement expected.");
             break;
 
         case 8:
-            printf("8. Incorrect symbol after statement part in block. Code index: %d", tokenNum);
+            printf("8. Incorrect symbol after statement part in block.");
             break;
 
         case 9:
-            printf("9. Period expected. Code index: %d", tokenNum);
+            printf("9. Period expected.");
             break;
 
         case 10:
-            printf("10. Semicolon between statements missing. Code index: %d", tokenNum);
+            printf("10. Semicolon between statements missing.");
             break;
 
         case 11:
-            printf("11. Undeclared identifier. Code index: %d", tokenNum);
+            printf("11. Undeclared identifier.");
             break;
 
         case 12:
-            printf("12. Assignment to constant or procedure is not allowed. Code index: %d", tokenNum);
+            printf("12. Assignment to constant or procedure is not allowed.");
             break;
 
         case 13:
-            printf("13. Assignment operator. Code index: %d", tokenNum);
+            printf("13. Assignment operator.");
             break;
 
         case 14:
-            printf("14. Call must be followed by an identifier. Code index: %d", tokenNum);
+            printf("14. Call must be followed by an identifier.");
             break;
 
         case 15:
-            printf("15. Call of a constant or variable is meaningless. Code index: %d", tokenNum);
+            printf("15. Call of a constant or variable is meaningless.");
             break;
 
         case 16:
-            printf("16. then expected. Code index: %d", tokenNum);
+            printf("16. then expected.");
             break;
 
         case 17:
-            printf("17. Semicolon or } expected. Code index: %d", tokenNum);
+            printf("17. Semicolon or } expected.");
             break;
 
         case 18:
-            printf("18. do expected. Code index: %d", tokenNum);
+            printf("18. do expected.");
             break;
 
         case 19:
-            printf("19. Incorrect symbol following statement. Code index: %d", tokenNum);
+            printf("19. Incorrect symbol following statement.");
             break;
 
         case 20:
-            printf("20. Relational operator expected. Code index: %d", tokenNum);
+            printf("20. Relational operator expected.");
             break;
 
         case 21:
-            printf("21. Expression must not contain a procedure identifier. Code index: %d", tokenNum);
+            printf("21. Expression must not contain a procedure identifier.");
             break;
 
         case 22:
-            printf("22. Right parenthesis missing. Code index: %d", tokenNum);
+            printf("22. Right parenthesis missing.");
             break;
 
         case 23:
-            printf("23. The preceding factor cannot begin with this symbol. Code index: %d", tokenNum);
+            printf("23. The preceding factor cannot begin with this symbol.");
             break;
 
         case 24:
-            printf("24. An expression cannot begin with this symbol. Code index: %d", tokenNum);
+            printf("24. An expression cannot begin with this symbol.");
             break;
 
         case 25:
-            printf("25. This number is too large. Code index: %d", tokenNum);
+            printf("25. This number is too large.");
             break;
 
         case 26:
-            printf("26. Unknown variable or constant found. Code index: %d", tokenNum);
+            printf("26. Unknown variable or constant found.");
             break;
 
         case 27:
-            printf("27. Used := instead of =. Code index: %d", tokenNum);
+            printf("27. Used := instead of =.");
             break;
 
         case 28:
-            printf("28. Invalid identifier for read or write, must use a variable. Code index: %d", tokenNum);
+            printf("28. Invalid identifier for read or write, must use a variable.");
             break;
 
         default:

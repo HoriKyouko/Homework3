@@ -9,7 +9,8 @@ procedure a;
 		procedure c;       
 			var y,z;       
 
-			begin         
+			begin    
+				c:=3;
 				z:=1;         
 				x:=y+z+w       
 			end;     
