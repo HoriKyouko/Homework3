@@ -75,7 +75,6 @@ int level;
 int codeIndex;
 int varCounter;
 int errorFlag;
-
 int tokenNum;
 
 // Function declarations
@@ -133,7 +132,7 @@ void Program(node *currentNode){
     // We add the halt condition via the emit function.
     else
         emit(op_sioh, 0, 0, 3);
-    // If we get here then we had no errors.
+    // If we get here  and errorFlag == 0 then we had no errors.
 	if(errorFlag != 1)
 		printf("No errors, program is syntactically correct.\n\n");
 }
@@ -253,12 +252,15 @@ int ProcDecl(node *currentNode){
             error(4);
 
         getNextToken(currentNode);
-
+		// Pointer gets currentToken and we add to the tokenTable procedure value and pointer value.
         pointer = currentToken;
         addTokenTable(procedure, pointer);
+		// We then set the level at the tokenTableIndex to level,
+		// and set the addr at the tokenTableIndex to be the codeIndex.
         tokenTable[tokenTableIndex].level = level;
         tokenTable[tokenTableIndex].addr = codeIndex;
         getNextToken(currentNode);
+		// Increment count; for how many procedures we have.
         count++;
         // If our token is not a semicolon we throw an error.
         if(currentToken != semicolonsym)
@@ -397,47 +399,52 @@ void Statement(node *currentNode){
         emit(op_jmp, 0, 0, pointerTemp);
         // We determine our offset by the codeIndex.
         code[codeTemp].m = codeIndex;
-    } else if(currentToken == readsym){
+    } 
+	// If our token is a read symbol.
+	else if(currentToken == readsym){
         getNextToken(currentNode);
-
+		// Check to see if our token is the identsym if it isn't throw an error.
         if(currentToken != identsym)
             error(11);
-
+		// Get our next token and set pointer to the value of where our token is in the table.
         getNextToken(currentNode);
         pointer = findToken(currentToken);
-
+		// If the kind isn't a variable throw an error.
         if(tokenTable[pointer].kind != variable)
             error(28);
-
+		// Increment the register.
         currentRegister++;
-        // generate code to read to the current register
+        // Generate code to read to the current register
         emit(op_sior, currentRegister, 0, 2);
-        // store the value that was read
+        // Store the value that was read
         emit(op_sto, currentRegister, level-tokenTable[pointer].level, tokenTable[pointer].addr);
+		// Decrement the Register.
         currentRegister--;
-
-
+		// Get the next token.
         getNextToken(currentNode);
 
-    } else if(currentToken == writesym){
-         getNextToken(currentNode);
-
+    } 
+	// If our token is a write symbol.
+	else if(currentToken == writesym){
+        getNextToken(currentNode);
+		// check to see if the token is an identsym else throw an error. 
         if(currentToken != identsym)
             error(11);
-
+		// Get our next token and set pointer to the value of where our token is in the table.
         getNextToken(currentNode);
         pointer = findToken(currentToken);
-
+		// If the kind isn't a variable throw an error.
         if(tokenTable[pointer].kind != variable)
             error(28);
-
+		// Increment the register.
         currentRegister++;
-        // load the current register
+        // Load the current register
         emit(op_lod, currentRegister, level-tokenTable[pointer].level, tokenTable[pointer].addr);
-        // create code to print to screen
+        // Create code to print to screen
         emit(op_siop, currentRegister, 0, 1);
+		// Decrement the register.
         currentRegister--;
-
+		// Get the next token.
         getNextToken(currentNode);
     }
 }
@@ -731,6 +738,8 @@ void error(int error){
             printf("Unknown error");
             break;
     }
+	// Sets our global variable to be true (1) so that we don't print out
+	//  a statement saying we have no errors in our function.
 	errorFlag = 1;
     printf("\n");
 }
