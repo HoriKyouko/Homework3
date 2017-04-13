@@ -10,7 +10,6 @@ procedure a;
 			var y,z;       
 
 			begin    
-				c:=3;
 				z:=1;         
 				x:=y+z+w       
 			end;     
