@@ -638,9 +638,7 @@ void error(int error){
 
         case 4:
             printf("4. const, var, procedure must be followed by identifier.");
-
-
-            break;
+	    break;
 
         case 5:
             printf("5. Semicolon or comma missing.");
