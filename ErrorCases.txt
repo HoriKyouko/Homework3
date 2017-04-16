@@ -183,7 +183,7 @@ begin
 	
 end.
 
-/* Error: 1. Used := instead of =. */
+/* Error: 27. Used := instead of =. */
 
 const toot := 4;
 var x, y;
@@ -194,6 +194,69 @@ begin
 	
 end.
 
+/* New Parser Errors: */
+
+/* ================================================================== */
+
+/* Error: 14. Call must be followed by an identifier. */
+
+var x,y,z,v,w;
+procedure a;
+   var x,y,u,v;
+   begin
+     z:=2;
+     u:=z+w
+   end;
+ begin
+   x:=1;
+   y:=2;
+   z:=3;
+   v:=4;
+   w:=5;
+   x:=v+w;
+   write z;
+   call;
+ end.
+
+/* Error: 15. Call of a constant or variable is meaningless. */
+
+var x,y,z,v,w;
+procedure a;
+   var x,y,u,v;
+   begin
+     z:=2;
+     u:=z+w
+   end;
+ begin
+   x:=1;
+   y:=2;
+   z:=3;
+   v:=4;
+   w:=5;
+   x:=v+w;
+   write z;
+   call x;
+ end.
+
+/* Error: 21. Expression must not contain a procedure identifier. */
+
+var x,y,z,v,w;
+procedure a;
+   var x,y,u,v;
+   begin
+     z:=2;
+     u:=z+w
+   end;
+ begin
+   x:=1;
+   y:=2;
+   z:=3;
+   v:=4;
+   w:=5;
+   x:=a+w;
+   write z;
+   call a;
+ end.
 
 /* Lexer Errors: */
 

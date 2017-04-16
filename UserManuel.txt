@@ -1,0 +1,169 @@
+Compilation instructions:
+=========================
+
+	In you command prompt, navigate to the folder containing the relevant files.
+	Once you are in the folder, you should be able to simply type "make" and press
+	the return/enter button. The program will compiler itself with the name "cd".
+	NOTE: The make file must be in the same directory as the source code.
+	
+	
+How to Use the pl0 Compiler:
+============================
+	
+	First, you must wrtie your pl0 code. The document must be a .txt document with
+	the name "input.txt".
+	
+	To run the pl0 compiler, use the command:
+		./cd
+	followed by any combination of:
+		-l -a -v
+	-l will display the output of the lexer, -a will display the assembly code 
+	created by the code gen, and -v will display teh stack from the virtual machine.
+	You can also run the compiler without some or any of these instructions and you
+	will still be able to find the output in the files reated y the program.
+	
+	
+How to Write in pl0:
+====================
+	
+	Rules of pl0:
+	
+	The program must start with constant declarations, if any are needed. 
+	
+		const a=1,b=2,c=3;
+	
+		Note: multiple identifiers can be declared at once by separating them with commas.
+		Note: constants use '=' for assignment, rather than the ':=' used by variables, 
+		and cannot be reasigned. They must be assigned when created.
+	
+	Next, variables must be declared, if they are needed:
+	
+		var e,f,g;
+	
+		Note: make sure not to use identifier names already taken by other identifiers.
+	
+	Third, we declare procedures, if any are needed:
+	
+		procedure h;
+	
+	Variables, constants, bodies (blocks), and even more procedures can be 
+	created inside a procedure, and they follow the same rules as the rest
+	of the program (including following the const-var-procedure-block order).
+	
+	The main body (block) of the program comes next:
+	
+		begin
+			e := (3+b)*2;
+			e := e*2
+		end.
+		
+	The body can include any number of statements, such as
+		
+		begin-end:
+			
+			as you see from the example above, if the body of your program consists or more 
+			than one statement, it must go between "begin" and "end". This allows any number
+			of statements to go between the two. Statements are all of the operations defined
+			in this section, and will make up the bulk of the program. Inside the begin-end 
+			statement, each statement ends and is separated by a semicolon (;), except for the
+			last staement before the "end". 
+	
+		assignments with expressions:
+			
+			e := (3+b)*2;
+			
+			note: +,*,/,- are accepted, as are parenthesis ()
+			
+		if-then-else statements:
+		
+			if 
+				a<>b
+			then
+				begin
+					e := 2;
+					f := 3
+				end;
+			else
+				e := 5;
+		
+			note: <,<=,>=,>, and <> (does not equal) are the accepted relational operators
+			
+			If more than one line is needed under a "then" or "else", the user must use 
+			the begin-end statement around those steps.
+			
+		do-while loops
+			
+			while
+				e>0
+			do
+				begin
+					e = e-1;
+					f = f+e
+				end;
+			
+		read and write statements
+			
+			write e;
+			read e;
+			
+			write fills a variable with a user-submitted value, while read prints the value of
+			a variable to the screen. These can only use constants or variables, not procedures or numbers.
+		
+		and calls, which set a procedure in motion:
+		
+			call h;
+	
+	Finally, the period (.) marks the end of the program.
+	
+		
+	Here is a pl0 program that displayes many of the properties of pl0:
+	
+		const a=1,b=3,c=2;
+	
+		var e, f, g;
+		
+		procedure h;
+			const k = 5;
+			
+			var i, j;
+			
+			procedure l;
+				var m;
+				
+				begin
+					m = 12;
+					m = m*2
+				end
+				
+			
+			begin
+				e := (a+k)/2;
+				i := e*b;
+				write 1
+			end;
+		
+		begin
+			read g;
+			
+			f = (a+b-c)*g;
+			
+			while
+				f > 0
+			do
+				f := f-1;
+					
+			call h;
+				
+			if
+				a>f
+			then
+				f := f + a;
+			else
+				begin
+					g := f-a;
+					e := e*g
+				end;
+				
+			write e
+			
+		end.
